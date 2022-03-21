@@ -5,6 +5,7 @@ import {Row, Col, Form, Button, Card} from 'react-bootstrap';
 import Navigatorbar from './Navigatorbar';
 import { useDispatch, useSelector } from "react-redux";
 import ItemDescriptionItemCard from './ItemDescriptionItemCard';
+import url from './config.json';
 
 function ItemDescription(props){
 
@@ -41,7 +42,7 @@ function ItemDescription(props){
     useEffect((e) => {
         
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post('http://localhost:4000/itemdescription',{id : props.match.params.id})
+        axios.post(url.url+'/itemdescription',{id : props.match.params.id})
             .then(async(response)=>{
                 console.log("Response from Item description server is",response.data.name);
                 await setItem(response.data);
@@ -53,7 +54,7 @@ function ItemDescription(props){
                 await setDesc(response.data.description)
                 await setsalescount(response.data.salescount)
             })
-        axios.get('http://localhost:4000/likeditems')
+        axios.get(url.url+'/likeditems')
             .then(async response =>{
                 console.log("Response from liked items item description page is is",response)
                 await setLikedItems([...response.data])

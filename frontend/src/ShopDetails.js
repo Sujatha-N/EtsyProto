@@ -7,6 +7,7 @@ import Modal from 'react-modal';
 import EditItem from './EditItem';
 import ShopItemCard from './ShopItemCard';
 import { uploadFile } from 'react-s3';
+import url from './config.json';
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
@@ -51,27 +52,28 @@ function ShopDetails(props){
 
     useEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post('http://localhost:4000/shopdetails', {id: props.match.params.id})
+        axios.post(url.url+'/shopdetails', {id: props.match.params.id})
             .then(async(response)=>{
-                console.log("RESPONSE LIST OF SHOP ITEMS IS ",response.data);
+                console.log("RESPONSE LIST OF SHOP ITEMS IS ",response.data.result[0].email, response.data.email);
                 await setItems(response.data.result);
-                setShopname(response.data.result[0].shopname)
-                setShopOwner(response.data.result[0].owner)
-                setShopemail(response.data.result[0].email)
-                setUseremail(response.data.email)
-                settotalsalescount(response.data.salescount)
-                setshpimg(response.data.shopimage[0].shopimage)
+                await setShopname(response.data.result[0].shopname)
+                await setShopOwner(response.data.result[0].owner)
+                await setShopemail(response.data.result[0].email)
+                await setUseremail(response.data.email)
+                await settotalsalescount(response.data.salescount)
+                await setshpimg(response.data.shopimage[0].shopimage)
+
+                if(response.data.result[0].email == response.data.email){
+                    console.log("SETTING IS OWNER TRUe");
+                    setisOwner(true)
+                }
+                else{
+                    console.log("SETTING IS OWNER FALSE");
+                    setisOwner(false)
+                }
             });
 
-            if(shopemail===useremail){
-                console.log("Inside IS OWNER")
-                setisOwner(true);
-            }
-            else{
-                setisOwner(false);
-            }
-            console.log("IS OWNER IS", isOwner);
-            console.log("SHOP IMAGE IS", shpimg)
+            console.log("SHOP EMAIL IS", shopemail, useremail)
 
     }, []);
     
@@ -104,7 +106,7 @@ function ShopDetails(props){
         e.preventDefault();
         console.log("INSIDE SAVE IMAGE")
         axios.defaults.headers.common["x-auth-token"] = token;
-            axios.post('http://localhost:4000/updateshopimage', {shopimage:shopimage})
+            axios.post(url.url+'/updateshopimage', {shopimage:shopimage})
             .then(async(response)=>{
                 console.log("RESPONSE FROM SAVE IMAGE IS",response);
             history.push("/shopdetails/0")
@@ -114,7 +116,7 @@ function ShopDetails(props){
     const onsave = (e)=>{
         e.preventDefault();
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post('http://localhost:4000/additem',{itemname: iname, quantity: quantityAvailable, price: price, price_currency: '$', owner: shopOwner, itemimage: image, description: description, category: category})
+        axios.post(url.url+'/additem',{itemname: iname, quantity: quantityAvailable, price: price, price_currency: '$', owner: shopOwner, itemimage: image, description: description, category: category})
             .then((response)=>{
                 console.log("RESPONSE FROM ON SAVE IS", response);
                 if(response.status===200){
@@ -134,6 +136,7 @@ function ShopDetails(props){
 
     return(
         <div style={{marginTop:"150px"}}>
+            {shopemail === useremail && isOwner == false ? setisOwner(true): null}
             <div>
                 {isOwner && 
                     <Button style={{marginLeft:"1000px"}} className = "w-5 mt-1" type="submit" onClick = {()=>setShow(true)}>Add an Item</Button>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import {useHistory,Link} from 'react-router-dom';
 import {Row, Col, Form, Button} from 'react-bootstrap';
 import Navigatorbar from './Navigatorbar';
+import url from './config.json';
 
 function Sell(){
 
@@ -18,11 +19,11 @@ function Sell(){
 
     const checkavailability = (e)=>{
         e.preventDefault();
-        axios.post('http://localhost:4000/checkshopname', {name: shopName})
+        axios.post(url.url+'/checkshopname', {name: shopName})
             .then((response)=>{
                 console.log("Response in check shop name frontend is:",response.data);
                 if(response.status === 200){
-                    axios.post('http://localhost:4000/updateshopname',{name: shopName})
+                    axios.post(url.url+'/updateshopname',{name: shopName})
                         .then((response)=>{
                             console.log(response)
                             if(response.status === 200){

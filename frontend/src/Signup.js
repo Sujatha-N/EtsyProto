@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import axios from 'axios';
 import App from './App';
 import {useHistory} from 'react-router-dom';
+import url from './config.json';
 
  function Signup() {
         const [emailReg, setEmailReg] = useState('');
@@ -13,11 +14,11 @@ import {useHistory} from 'react-router-dom';
 
         const register = (e) => {
             e.preventDefault();
-            axios.post('http://localhost:4000/usersignup', {username: userNameReg , email:emailReg, password:passwordReg, image:'https://t4america.org/wp-content/uploads/2016/10/Blank-User.jpg'})
+            axios.post(url.url+'/usersignup', {username: userNameReg , email:emailReg, password:passwordReg, image:'https://t4america.org/wp-content/uploads/2016/10/Blank-User.jpg'})
                 .then((response)=>{
                     console.log("Response from user table is ",response);
                     if(response.status===200){
-                        axios.post('http://localhost:4000/shopsignup', {username: userNameReg, email:emailReg})
+                        axios.post(url.url+'/shopsignup', {username: userNameReg, email:emailReg})
                         .then((response)=>{
 
                             console.log("Response from shop table is ",response)

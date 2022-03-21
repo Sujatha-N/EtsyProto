@@ -7,7 +7,9 @@ import "./Styles/Styles.css";
 import Favourites from './Favourites';
 import { uploadFile } from 'react-s3';
 import React from 'react';
+import url from './config.json';
 window.Buffer = window.Buffer || require("buffer").Buffer;
+
 
 const config = {
     bucketName: 'etsy-ecommerce',
@@ -38,7 +40,7 @@ function Profile(){
 
     useEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.get('http://localhost:4000/editprofile')
+        axios.get(url.url+'/editprofile')
             .then((response)=>{
                 console.log(response.data);
                 setEmailPro(response.data.email)
@@ -57,7 +59,7 @@ function Profile(){
             .then((data)=>{
                 console.log("Response from react S3 is", data.location);
                 axios.defaults.headers.common["x-auth-token"] = token;
-                axios.post('http://localhost:4000/profilepic', {image: data.location})
+                axios.post(url.url+'/profilepic', {image: data.location})
                     .then((response)=>{
                         console.log(response.data);
                     })

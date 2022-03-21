@@ -4,6 +4,7 @@ import { Navbar, NavDropdown, Nav, Container, Button, Form, FormControl} from 'r
 import Modal from 'react-modal';
 import {countries, languages, pricecurrency} from './common/countrieslist';
 import {useDispatch} from 'react-redux';
+import url from './config.json';
 
 
 

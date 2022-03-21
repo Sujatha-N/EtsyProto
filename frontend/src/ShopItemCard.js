@@ -6,6 +6,7 @@ import Navigatorbar from './Navigatorbar';
 import {useDispatch, useSelector} from 'react-redux';
 import { userfavouritesreducer } from './redux/reducers/UserReducer';
 import EditItem from './EditItem';
+import url from './config.json';
 
 function ShopItemCard(props){
 

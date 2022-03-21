@@ -3,6 +3,7 @@ import axios from 'axios';
 import {useHistory,Link} from 'react-router-dom';
 import {Row, Col, Form, Button} from 'react-bootstrap';
 import {useSelector} from 'react-redux';
+import url from './config.json';
 
 function Orders(props){
 
@@ -18,7 +19,7 @@ function Orders(props){
     useEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
         console.log("Params id is", props.match.params.id)
-        axios.post('http://localhost:4000/orderid', {orderid: props.match.params.id})
+        axios.post(url.url+'/orderid', {orderid: props.match.params.id})
             .then((response)=>{
                 console.log("Response from Get orders API is",response.data);
                 setOrders(response.data);

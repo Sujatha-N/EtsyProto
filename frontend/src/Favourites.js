@@ -4,6 +4,7 @@ import {useHistory,Link} from 'react-router-dom';
 import {Row, Col, Form, Button, FormControl} from 'react-bootstrap';
 import Navigatorbar from './Navigatorbar';
 import ItemsCard from './ItemsCard';
+import url from './config.json';
 
 function Favourites(){
 
@@ -19,7 +20,7 @@ function Favourites(){
 
     useEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.get('http://localhost:4000/favourites')
+        axios.get(url.url+'/favourites')
             .then(async response =>{
                 console.log("Response in favourites items is ",response.data)
                 await setItems([...response.data])

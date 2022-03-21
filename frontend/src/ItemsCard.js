@@ -5,6 +5,7 @@ import {Row, Col, Form, Button, Card} from 'react-bootstrap';
 import Navigatorbar from './Navigatorbar';
 import {useDispatch, useSelector} from 'react-redux';
 import { userfavouritesreducer } from './redux/reducers/UserReducer';
+import url from './config.json';
 
 function ItemsCard(props){
 
@@ -37,7 +38,7 @@ function ItemsCard(props){
 
         axios.defaults.headers.common["x-auth-token"] = token;
         console.log("Item id is", props.item.itemid);
-        axios.post('http://localhost:4000/favouritesid', {itemid:props.item.itemid})
+        axios.post(url.url+'/favouritesid', {itemid:props.item.itemid})
             .then((response)=>{
                 console.log("Liked data is",response.data.liked);
                 setLiked(response.data.liked);
@@ -46,7 +47,7 @@ function ItemsCard(props){
                     setLiked('no')
                     setbgcolor('#DCDCDC')
                     axios.defaults.headers.common["x-auth-token"] = token;
-                    axios.post('http://localhost:4000/removefromfavourites', {itemid: props.item.itemid})
+                    axios.post(url.url+'/removefromfavourites', {itemid: props.item.itemid})
                         .then((response)=>{
                             console.log(response.status);
                             if(response.status===200){

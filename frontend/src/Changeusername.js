@@ -3,6 +3,7 @@ import axios from 'axios';
 import {useHistory,Link} from 'react-router-dom';
 import {Row, Col, Form, Button} from 'react-bootstrap';
 import Navigatorbar from './Navigatorbar';
+import url from './config.json';
 
 function Changeusername(){
 
@@ -19,7 +20,7 @@ function Changeusername(){
     const saveChanges = (e)=>{
         e.preventDefault();
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post('http://localhost:4000/changeusername',{username: userNamePro})
+        axios.post(url.url+'/changeusername',{username: userNamePro})
             .then((response)=>{
                 if(response.status === 200)
                 console.log("Inside 200 for Change Username");

@@ -3,6 +3,7 @@ import axios from 'axios';
 import {useHistory,Link} from 'react-router-dom';
 import {Row, Col, Form, Button} from 'react-bootstrap';
 import {useSelector, useDispatch} from 'react-redux';
+import url from './config.json';
 
 function CartItem(props){
 

@@ -4,6 +4,7 @@ import {useHistory,Link} from 'react-router-dom';
 import {Row, Col, Form, Button} from 'react-bootstrap';
 import CartItem from './CartItem'
 import {useDispatch, useSelector} from 'react-redux';
+import url from './config.json';
 
 function Cart(){
     
@@ -12,6 +13,8 @@ function Cart(){
     const cartreducer = useSelector((state)=> state);
     console.log("CHECKING CART REDUCER DATA: ",cartreducer);
     const cart = cartreducer.cartreducer.cart;
+
+    console.log('URL', url)
 
     console.log("Cart from Cart reducer data is",cart);
 
@@ -34,18 +37,18 @@ function Cart(){
     const checkouthandler = (e) =>{
         e.preventDefault();
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post('http://localhost:4000/purchase', {itemstotal:cart.length})
+        axios.post(url.url+'/purchase', {itemstotal:cart.length})
             .then((response)=>{
                 console.log("Inserted data is",response);
                 if(response.status===200){
                     console.log("Inserted into purchases and moves on to inserting in orders")
                     cart.map((item)=>{
                         console.log("Item from cart is",item)
-                        axios.post('http://localhost:4000/orders', {ordername:item.iname, orderquantity: item.quantity, orderprice: item.price, orderitemid: item.id, orderimage: item.itemimage})
+                        axios.post(url.url+'/orders', {ordername:item.iname, orderquantity: item.quantity, orderprice: item.price, orderitemid: item.id, orderimage: item.itemimage})
                             .then((response)=>{
                                 console.log(response);
                                 if(response.status === 200){
-                                    axios.post('http://localhost:4000/updatequantity', {orderitemid:item.id})
+                                    axios.post(url.url+'/updatequantity', {orderitemid:item.id})
                                         .then((response)=>{
                                             console.log("Updated quantity for items")
                                             if(response.status===200){
@@ -57,7 +60,7 @@ function Cart(){
                     })
                 }
             })
-        axios.get('http://localhost:4000/editprofile')
+        axios.get(url.url+'/editprofile')
             .then((response) =>{
                 console.log(response)
                 if(response.data.address!=null){

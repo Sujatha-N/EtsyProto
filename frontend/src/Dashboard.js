@@ -4,6 +4,7 @@ import {useHistory,Link} from 'react-router-dom';
 import {Row, Col, Form, Button, Dropdown} from 'react-bootstrap';
 import Navigatorbar from './Navigatorbar';
 import ItemCard from './ItemCard';
+import url from './config.json';
 // import S3 from 'react-aws-s3'; 
 import { uploadFile } from 'react-s3';
 window.Buffer = window.Buffer || require("buffer").Buffer;
@@ -39,13 +40,13 @@ function Dashboard(props){
 
     useEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.get('http://localhost:4000/listofitems')
+        axios.get(url.url+'/listofitems')
             .then(async response =>{
                 console.log("Response in items ",response.data)
                 console.log("Display filter search is", props.filterSearch);
                 await setItems([...response.data])
             })
-        axios.get('http://localhost:4000/likeditems')
+        axios.get(url.url+'/likeditems')
         .then(async response =>{
             console.log("Response from liked items dashboard is",response)
             await setLikedItems([...response.data])
@@ -225,7 +226,7 @@ function Dashboard(props){
         e.preventDefault();
         setPricerange(true)
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post('http://localhost:4000/pricerange', {min:0, max:99})
+        axios.post(url.url+'/pricerange', {min:0, max:99})
             .then(async response =>{
                 console.log("Response in price range ",response.data)
                 setPricerangeitems(response.data)
@@ -236,7 +237,7 @@ function Dashboard(props){
         e.preventDefault();
         setPricerange(true)
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post('http://localhost:4000/pricerange', {min:100, max:499})
+        axios.post(url.url+'/pricerange', {min:100, max:499})
             .then(async response =>{
                 console.log("Response in price range ",response.data)
                 setPricerangeitems(response.data)
@@ -247,7 +248,7 @@ function Dashboard(props){
         e.preventDefault();
         setPricerange(true)
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post('http://localhost:4000/pricerange', {min:500, max:999})
+        axios.post(url.url+'/pricerange', {min:500, max:999})
             .then(async response =>{
                 console.log("Response in price range ",response.data)
                 setPricerangeitems(response.data)
@@ -258,7 +259,7 @@ function Dashboard(props){
         e.preventDefault();
         setPricerange(true)
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post('http://localhost:4000/pricerange', {min:1000, max:1000000000000000})
+        axios.post(url.url+'/pricerange', {min:1000, max:1000000000000000})
             .then(async response =>{
                 console.log("Response in price range ",response.data)
                 setPricerangeitems(response.data)

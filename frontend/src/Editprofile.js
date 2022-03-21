@@ -5,6 +5,7 @@ import {Row, Col, Form, Button} from 'react-bootstrap';
 import Navigatorbar from './Navigatorbar';
 import { uploadFile } from 'react-s3';
 import {countries} from './common/countrieslist';
+import url from './config.json';
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
@@ -53,7 +54,7 @@ function Editprofile(){
 
     useEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.get('http://localhost:4000/editprofile')
+        axios.get(url.url+'/editprofile')
             .then((response)=>{
                 console.log(response.data);
                 setImage(response.data.image)
@@ -75,7 +76,7 @@ function Editprofile(){
         e.preventDefault();
         axios.defaults.headers.common["x-auth-token"] = token;
         console.log("PHONE IS", phoneEdit, birthMonthEdit)
-        axios.post('http://localhost:4000/editprofile', {username: usernameEdit, gender: genderEdit, city: cityEdit, about: aboutEdit, image: image, dob: birthMonthEdit,  email: email, phone: phoneEdit, country: country, address:address})
+        axios.post(url.url+'/editprofile', {username: usernameEdit, gender: genderEdit, city: cityEdit, about: aboutEdit, image: image, dob: birthMonthEdit,  email: email, phone: phoneEdit, country: country, address:address})
             .then((response)=>{
                 console.log(response.status);
                 if(response.status===200){

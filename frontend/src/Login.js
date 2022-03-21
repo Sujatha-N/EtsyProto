@@ -2,16 +2,19 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { Form, Button, Card, Alert } from 'react-bootstrap'
 import { Link, useHistory } from 'react-router-dom';
+import url from './config.json';
 
 function Login() {
     localStorage.setItem('token', JSON.stringify(''));
     const [emailReg, setEmailReg] = useState('')
     const [passwordReg, setPasswordReg] = useState('')
     const [message, setMessage] = useState('');
+
+    console.log("URL IS", url)
     
     const login = (e)=>{
         e.preventDefault();
-        axios.post('http://localhost:4000/login', {email: emailReg, password: passwordReg})
+        axios.post(url.url+'/login', {email: emailReg, password: passwordReg})
             .then((response)=>{
                 console.log(response.data.accessToken);
                 localStorage.setItem('token', JSON.stringify(response.data.accessToken));

@@ -6,6 +6,7 @@ import Navigatorbar from './Navigatorbar';
 import {useDispatch, useSelector} from 'react-redux';
 import { userfavouritesreducer } from './redux/reducers/UserReducer';
 import {currencyreducer} from './redux/reducers/UserReducer';
+import url from './config.json';
 
 function ItemDescriptionItemCard(props){
 
@@ -50,7 +51,7 @@ function ItemDescriptionItemCard(props){
         e.preventDefault();
 
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post('http://localhost:4000/favouritesid', {itemid:props.item.id})
+        axios.post(url.url+'/favouritesid', {itemid:props.item.id})
             .then((response)=>{
                 console.log("Liked data is",response.data);
                 setLiked(response.data);
@@ -58,7 +59,7 @@ function ItemDescriptionItemCard(props){
                     setLiked('no')
                     setbgcolor('#DCDCDC')
                     axios.defaults.headers.common["x-auth-token"] = token;
-                    axios.post('http://localhost:4000/removefromfavourites', {itemid: props.item.id})
+                    axios.post(url.url+'/removefromfavourites', {itemid: props.item.id})
                         .then((response)=>{
                             console.log(response.status);
                             if(response.status===200){
@@ -72,7 +73,7 @@ function ItemDescriptionItemCard(props){
                     setLiked('yes');
                     setbgcolor('red');
                     axios.defaults.headers.common["x-auth-token"] = token;
-                    axios.post('http://localhost:4000/addtofavourites', {itemid: props.item.id, itemname: props.item.iname, itemprice: props.item.price, itemcurrency: props.item.price_currency, liked:'yes', image: props.item.itemimage})
+                    axios.post(url.url+'/addtofavourites', {itemid: props.item.id, itemname: props.item.iname, itemprice: props.item.price, itemcurrency: props.item.price_currency, liked:'yes', image: props.item.itemimage})
                         .then((response)=>{
                             console.log(response);
                             if(response.status===200){

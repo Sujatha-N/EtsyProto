@@ -4,6 +4,7 @@ import {useHistory,Link} from 'react-router-dom';
 import {Row, Col, Form, Button} from 'react-bootstrap';
 import {useSelector} from 'react-redux';
 import Orders from './Orders';
+import url from './config.json';
 
 function Purchases(){
 
@@ -18,7 +19,7 @@ function Purchases(){
 
     useEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.get('http://localhost:4000/purchase')
+        axios.get(url.url+'/purchase')
             .then((response)=>{
                 console.log(response.data);
                 setOrders(response.data);

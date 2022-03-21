@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { NavLink, Redirect, useHistory, Link } from 'react-router-dom';
 import { Navbar, NavDropdown, Nav, Container, Button, Form, FormControl} from 'react-bootstrap';
 import axios from 'axios';
+import url from './config.json';
 
 function Navigatorbar(props){
   const token = JSON.parse(localStorage.getItem('token'));
@@ -17,7 +18,7 @@ function Navigatorbar(props){
     e.preventDefault();
     axios.defaults.headers.common["x-auth-token"] = token;
     console.log("Token in Nav bar is", token)
-    axios.get('http://localhost:4000/shopdetails')
+    axios.get(url.url+'/shopdetails')
     .then((response)=>{
       console.log("Response from axios shop details from navbar is",response.data);
       if(response.data.name != ''){

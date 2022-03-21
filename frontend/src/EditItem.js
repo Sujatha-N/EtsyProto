@@ -5,6 +5,7 @@ import {Row, Col, Form, Button} from 'react-bootstrap';
 import Modal from 'react-modal';
 import "./Styles/Styles.css";
 import { uploadFile } from 'react-s3';
+import url from './config.json';
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 const config = {
@@ -40,7 +41,7 @@ function EditItem(props){
 
     useLayoutEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
-         axios.post('http://localhost:4000/edititem', {id: props.itemid})
+         axios.post(url.url+'/edititem', {id: props.itemid})
             .then(async response =>{
                 console.log("Response in items ",response.data)
                 await setItems(response.data)
@@ -72,7 +73,7 @@ function EditItem(props){
     const onsave = (e)=>{
         e.preventDefault();
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post('http://localhost:4000/updateedititem', {id: props.itemid, iname: iname, quantity: quantityAvailable, price: price, itemimage: image, category:category, description:description})
+        axios.post(url.url+'/updateedititem', {id: props.itemid, iname: iname, quantity: quantityAvailable, price: price, itemimage: image, category:category, description:description})
             .then(async response =>{
                 console.log("Response in items ",response.data[0])
                 window.location.reload();
