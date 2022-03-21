@@ -149,6 +149,7 @@ app.get("/shopdetails", (req,res)=>{
     console.log("decoded in GET shopdetails API: ", decoded);
 
     connection.query("SELECT name FROM shop WHERE email = ?", [decoded], (err,result)=>{
+        console.log("Inside GET SHOP DETAILS")
         if(err){
             res.send({err: err});
             console.log(err)
@@ -157,6 +158,11 @@ app.get("/shopdetails", (req,res)=>{
             console.log("Result from shop page is:", result[0]);
             res.send(result[0]);
         }
+        if(result.length===0){
+            console.log("Result from shop page is:");
+            res.status(404).send('Empty string found');
+        }
+
     })
 })
 

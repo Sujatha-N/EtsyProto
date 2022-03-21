@@ -19,16 +19,16 @@ function Navigatorbar(props){
     axios.defaults.headers.common["x-auth-token"] = token;
     console.log("Token in Nav bar is", token)
     axios.get(url.url+'/shopdetails')
-    .then((response)=>{
-      console.log("Response from axios shop details from navbar is",response.data);
-      if(response.data.name != ''){
-        console.log("Inside shop details response");
-        history.push(`/shopdetails/${ownid}`)
-      }
-      else{
-        console.log("Inside sell response");
+      .then((response)=>{
+        console.log("Response from axios shop details from navbar is",response);
+        if(response.data.name != ''){
+          console.log("Inside shop details response");
+          history.push(`/shopdetails/${ownid}`)
+        }
+      })
+      .catch((err)=>{
+        console.log("INSIDE CATCH ");
         history.push("/sell");
-      }
     })
   }
 
