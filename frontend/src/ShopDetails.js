@@ -31,6 +31,8 @@ function ShopDetails(props){
 
     console.log("PROPS MATCH ID IS",props.match.params.id)
 
+    const categories = ['Clothing', 'Jewellery', 'Entertainment', 'Home Decor', 'Art'];
+
 
     const[useremail,setUseremail] = useState('')
     const[totalsalescount, settotalsalescount]= useState()
@@ -49,33 +51,42 @@ function ShopDetails(props){
     const[image, setImage] = useState('https://upload.wikimedia.org/wikipedia/commons/6/6a/A_blank_flag.png');
     const[shopimage, setshopimage] = useState()
     const[shpimg, setshpimg] = useState('')
+    const[allcategories, setallcategories] = useState(categories)
 
     useEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
         axios.post(url.url+'/shopdetails', {id: props.match.params.id})
             .then(async(response)=>{
-                console.log("RESPONSE LIST OF SHOP ITEMS IS ",response.data.result[0].email, response.data.email);
+                console.log("RESPONSE LIST OF SHOP ITEMS IS ",response.data, response.data.email);
                 await setItems(response.data.result);
-                await setShopname(response.data.result[0].shopname)
-                await setShopOwner(response.data.result[0].owner)
-                await setShopemail(response.data.result[0].email)
+                if(response.data.result.length>0){
+                    await setShopname(response.data.result[0].shopname)
+                    await setShopemail(response.data.result[0].email)
+                    // await setshpimg(response.data.shopimage[0].shopimage)
+                }
+                
+                await setShopOwner(response.data.owner)
                 await setUseremail(response.data.email)
                 await settotalsalescount(response.data.salescount)
-                await setshpimg(response.data.shopimage[0].shopimage)
-
-                if(response.data.result[0].email == response.data.email){
-                    console.log("SETTING IS OWNER TRUe");
-                    setisOwner(true)
-                }
-                else{
-                    console.log("SETTING IS OWNER FALSE");
-                    setisOwner(false)
-                }
+               
+                if(response.data.result.length>0){
+                    if(response.data.result[0].email == response.data.email){
+                        console.log("SETTING IS OWNER TRUe");
+                        setisOwner(true)
+                    }
+                    else{
+                        console.log("SETTING IS OWNER FALSE");
+                        setisOwner(false)
+                    }
+                } 
+                
             });
 
             console.log("SHOP EMAIL IS", shopemail, useremail)
 
     }, []);
+
+
     
 
     const imageupload = (e)=>{
@@ -132,6 +143,13 @@ function ShopDetails(props){
             });
     }
 
+    const addcategory = (e)=>{
+        e.preventDefault();
+        const newcat = [...allcategories]
+        newcat.push(category);
+        setallcategories(newcat)
+    }
+
 
 
     return(
@@ -148,7 +166,6 @@ function ShopDetails(props){
                 <br/>
                 <b>List of items:</b> 
                 <Row>
-                    
                     {items.map((item)=>{
                         return (
                         <Col>
@@ -205,11 +222,21 @@ function ShopDetails(props){
 
                     <div>
                         <label><b>Category: </b></label>
-                        <input id="category" type="text"
+                        <select
+                        onChange={(e)=>{setCategory(e.target.value)}}
+                        >
+                        {allcategories.map((index) => <option>{index}</option>)}
+                        </select>
+
+                        <input id="cat" type="text"
                         onChange={(e)=>{
                             setCategory(e.target.value);
                         }}
                         />
+                        
+                        <Button className = "w-5 mt-1" type="submit" onClick={addcategory}>Add Category</Button>
+
+
                     </div>
 
                     <br/>

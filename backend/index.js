@@ -52,6 +52,7 @@ app.post("/shopsignup",(req,res) =>{
     const email = req.body.email;
     
     connection.query("INSERT INTO shop (owner,email) VALUES (?,?)", [username,email], (err, result)=>{
+        console.log("USERNAME", username, email)
         if(err){
             console.log(err);
         }
@@ -148,7 +149,7 @@ app.get("/shopdetails", (req,res)=>{
     const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
     console.log("decoded in GET shopdetails API: ", decoded);
 
-    connection.query("SELECT name FROM shop WHERE email = ?", [decoded], (err,result)=>{
+    connection.query("SELECT username FROM user WHERE email = ?", [decoded], (err,result)=>{
         console.log("Inside GET SHOP DETAILS")
         if(err){
             res.send({err: err});
@@ -156,13 +157,31 @@ app.get("/shopdetails", (req,res)=>{
         }
         if(result.length>0){
             console.log("Result from shop page is:", result[0]);
-            res.send(result[0]);
-        }
-        if(result.length===0){
-            console.log("Result from shop page is:");
-            res.status(404).send('Empty string found');
-        }
+            let owner = result[0].username
 
+            connection.query("SELECT * FROM shop WHERE email = ?", [decoded], (errr,resultt)=>{
+                if(errr){
+                    res.send({errr: errr});
+                    console.log(errr)
+                }
+                if(resultt.length>0){
+                    console.log("Result from shop page is:", resultt[0]);
+                    res.send(resultt[0]);
+                }
+                else{
+                    connection.query("INSERT INTO shop (owner,email) VALUES (?,?)", [owner, decoded], (errrr, resulttt)=>{
+                        if(errrr){
+                            console.log(errrr);
+                        }
+                        else{
+                            console.log("Inserted successfully into the user table: " ,resulttt);
+                            res.status(404).send("Shop name is not defined")
+                        }
+                    })
+                }
+            })
+        }
+        
     })
 })
 
@@ -299,27 +318,29 @@ app.post("/shopdetails",(req,res)=>{
                 res.send({err: err});
                 console.log(err)
             }
-            if(result.length>0){
+            if(result.length>=0){
                 console.log("Result from TSC is:", result);
                 connection.query("SELECT SUM(salescount) as salescount FROM items WHERE email = ?", [decoded], (errr,resultt)=>{
                     if(errr){
                         res.send({errr: errr});
                         console.log(errr)
                     }
-                    if(result.length>0){
+                    if(result.length>=0){
                         console.log("Result from TOTAL SALES COUNT is:", resultt[0].salescount);
                         let salescount = resultt[0].salescount
                         console.log("DECODED FOR TESTING IS", decoded)
 
-                        connection.query("SELECT shopimage FROM shop where email = ?", [decoded], (errrr,resulttt)=>{
+                        connection.query("SELECT shopimage,owner FROM shop where email = ?", [decoded], (errrr,resulttt)=>{
                             if(errrr){
                                 res.send({errrr: errrr});
                                 console.log(errrr)
                             }
-                            if(resulttt){
-                                console.log("SHOP IMAGE IS", resulttt.shopimage)
-                                let shopimage = resulttt.shopimage;
-                                res.send({result:result, email:decoded, salescount:salescount, shopimage: shopimage});
+                            if(resulttt.length>0){
+                                console.log("SHOP IMAGE IS", resulttt)
+                                let shopimage = resulttt[0].shopimage;
+                                let owner = resulttt[0].owner;
+                                console.log("OWNER IS", resulttt.owner);
+                                res.send({result:result, email:decoded, salescount:salescount, shopimage: shopimage, owner: owner});
                             }
                         })
                     }
@@ -353,7 +374,7 @@ app.post("/shopdetails",(req,res)=>{
                             if(result.length>0){
                                 console.log("Result from TOTAL SALES COUNT is:", resultt[0].salescount);
                                 let salescount = resultt[0].salescount
-                                connection.query("SELECT shopimage FROM shop where email = ?", [decoded], (errrr,resulttt)=>{
+                                connection.query("SELECT shopimage,owner FROM shop where email = ?", [decoded], (errrr,resulttt)=>{
                                     if(errrr){
                                         res.send({errrr: errrr});
                                         console.log(errrr)
@@ -361,7 +382,9 @@ app.post("/shopdetails",(req,res)=>{
                                     if(resulttt){
                                         console.log("SHOP IMAGE IS", resulttt)
                                         let shopimage = resulttt;
-                                        res.send({result:result, email:decoded, salescount:salescount, shopimage: resulttt});
+                                        let owner = resulttt.owner;
+                                        res.send({result:result, email:decoded, salescount:salescount, shopimage: shopimage, owner: owner});
+                                        // res.send({result:result, email:decoded, salescount:salescount, shopimage: resulttt});
                                     }
                                 })
                             }
@@ -519,14 +542,15 @@ app.post("/additem",(req,res)=>{
         if(result.length===0){
             console.log("Inside adding the item")
 
-            connection.query("SELECT name from SHOP WHERE email = ?", [decoded], (err,result)=>{
+            connection.query("SELECT name from shop WHERE email = ?", [decoded], (err,result)=>{
                 if(err){
                     res.send({err: err});
                     console.log(err)
                 }
                 if(result){
                     const shopname = result
-                    connection.query("INSERT INTO items (owner,iname, quantity, price_currency, price, email, itemimage, shopname, category, description) VALUES (?,?,?,?,?,?,?,?,?,?)", [req.body.owner,req.body.itemname, req.body.quantity,req.body.price_currency,req.body.price,decoded, req.body.itemimage, shopname, req.body.category, req.body.description], (err,result)=>{
+                    let id = Math.random()*(1000);
+                    connection.query("INSERT INTO items (id, owner,iname, quantity, price_currency, price, email, itemimage, shopname, category, description) VALUES (?,?,?,?,?,?,?,?,?,?,?)", [id, req.body.owner,req.body.itemname, req.body.quantity,req.body.price_currency,req.body.price,decoded, req.body.itemimage, shopname, req.body.category, req.body.description], (err,result)=>{
                         if(err){
                             res.send({err: err});
                             console.log(err)

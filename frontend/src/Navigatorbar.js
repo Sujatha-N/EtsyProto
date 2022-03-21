@@ -20,8 +20,8 @@ function Navigatorbar(props){
     console.log("Token in Nav bar is", token)
     axios.get(url.url+'/shopdetails')
       .then((response)=>{
-        console.log("Response from axios shop details from navbar is",response);
-        if(response.data.name != ''){
+        console.log("Response from axios shop details from navbar is",response.data.name);
+        if(response.data.name !== ''){
           console.log("Inside shop details response");
           history.push(`/shopdetails/${ownid}`)
         }

@@ -18,14 +18,7 @@ import url from './config.json';
                 .then((response)=>{
                     console.log("Response from user table is ",response);
                     if(response.status===200){
-                        axios.post(url.url+'/shopsignup', {username: userNameReg, email:emailReg})
-                        .then((response)=>{
-
-                            console.log("Response from shop table is ",response)
-                            if(response.status===200){
-                                history.push("/login")
-                            }
-                        })
+                        history.push('/login')
                     }
                 })
         }
