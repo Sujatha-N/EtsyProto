@@ -28,7 +28,7 @@ function Sell(){
                             console.log(response)
                             if(response.status === 200){
                                 setMessage('')
-                                history.push('/shopdetails');
+                                history.push('/shopdetails/0');
                             }
                         })
                 }
