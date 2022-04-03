@@ -46,13 +46,24 @@ function Dashboard(props){
                 console.log("Display filter search is", props.filterSearch);
                 await setItems([...response.data])
             })
-        axios.get(url.url+'/likeditems')
-        .then(async response =>{
-            console.log("Response from liked items dashboard is",response)
-            await setLikedItems([...response.data])
-        })
+        // axios.get(url.url+'/likeditems')
+        //     .then(async response =>{
+        //         console.log("Response from liked items dashboard is ********************",response)
+        //         await setLikedItems([...response.data])
+        //     })
         
     },[instockitems, sorted, pricerangeitems]);
+
+    useEffect((e) => {
+        axios.defaults.headers.common["x-auth-token"] = token;
+        axios.get(url.url+'/likeditems')
+            .then(async response =>{
+                console.log("Response from liked items dashboard is ********************",response.data)
+                await setLikedItems([...response.data])
+            })
+    },[]);
+
+
 
     console.log("LIKED ITEMS IS", likeditems)
 
@@ -344,7 +355,7 @@ function Dashboard(props){
                         return (
                             <Col>
                                 {/* {JSON.stringify(likeditem)} */}
-                                <ItemCard item= {item}/>
+                                <ItemCard item= {item} likeditem={likeditem}/>
                             </Col>
                         );
                     }
@@ -356,7 +367,7 @@ function Dashboard(props){
                     {!pricerange && sortflag && sorted.map((item)=>{
                         // console.log("ITEM IN DASHBOARD IS", item.id)
                         console.log("PRICE RANGE INSIDE SORTED IS", pricerange)
-                        const likeditem = likeditems.filter(likeitem=>{
+                        let likeditem = likeditems.filter(likeitem=>{
                             // console.log("ITEM ID INSIDE FILTER IS", parseInt(likeitem.itemid), item.id)
                             if(parseInt(likeitem.itemid)===item.id){
                                 console.log("INSIDE EQUALS");
@@ -366,6 +377,7 @@ function Dashboard(props){
                             }
                             
                         })
+
                         console.log("LIKED ITEM IN DASHBOARD IS", likeditem)
                         return (
                             <Col>

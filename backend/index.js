@@ -483,6 +483,25 @@ app.get("/listofitems",(req,res)=>{
 
 })
 
+app.post("/likeditems",(req,res)=>{
+    console.log(req.body);
+    const token = req.header("x-auth-token");
+    const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
+    console.log("decoded in liked items API: ", decoded);
+
+    connection.query("SELECT liked FROM favourites join items on items.id = favourites.itemid where favourites.itemid = ? and favourites.email = ?", [req.body.id, decoded], (err,result)=>{
+        if(err){
+            res.send({err: err});
+            console.log(err)
+        }
+        if(result){
+            console.log("LIKED ITEMS IN DASHBOARD IS", result)
+            res.status(200).send(result)
+        }
+    })
+
+})
+
 app.get("/likeditems",(req,res)=>{
     console.log(req.body);
     const token = req.header("x-auth-token");
@@ -671,16 +690,17 @@ app.post("/addtofavourites",(req,res) =>{
         }
         else{
             console.log("Inserted successfully into the favourites table: " ,result);
-            connection.query("UPDATE items SET liked = 'yes' where id = ? ",[req.body.itemid], (error, itemsresult)=>{
-                if(error){
-                    console.log(error);
-                }
-                else{
-                    console.log("UPDATED successfully into the items table: " ,itemsresult);
+            // connection.query("UPDATE items SET liked = 'yes' where id = ? ",[req.body.itemid], (error, itemsresult)=>{
+            //     if(error){
+            //         console.log(error);
+            //     }
+            //     else{
+            //         console.log("UPDATED successfully into the items table: " ,itemsresult);
                     
-                    res.status(200).send("Inserted successfully into the favourites table")
-                }
-            })
+            //         res.status(200).send("Inserted successfully into the favourites table")
+            //     }
+            // })
+            res.status(200).send("Inserted successfully into the favourites table")
         }
     })
 })

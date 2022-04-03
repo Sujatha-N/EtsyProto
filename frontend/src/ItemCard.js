@@ -23,27 +23,30 @@ function ItemCard(props){
 
 
     const[bgcolor, setbgcolor] = useState('#DCDCDC');
-    const[liked, setLiked]= useState(props.item.liked);
+    const[liked, setLiked]= useState();
 
 
-    console.log("LIKED ITEMS IN THE ITEM CARD IS", props, props.item.liked)
+    console.log("LIKED ITEMS IN THE ITEM CARD IS", props, props.item, props.likeditem)
 
     useEffect((e) => {
 
-        if(props){
-            console.log("TESTING ------",  props.item.id);
+        if(props.likeditem[0]){
+            console.log("TESTING ------",  props.item.id, props.likeditem[0].liked);
 
-            if(props.item.liked === 'yes'){
+            if(props.likeditem[0].liked === 'yes'){
                 setbgcolor('red');
             }
-            else if (props.item.liked === 'no'){
+            else if (props.likeditem[0].liked === 'no'){
                 setbgcolor('#DCDCDC');
             }
         
         }
-        // console.log("Item image is", props.item.itemimage);
+        else{
+            setbgcolor('#DCDCDC')
+        }
+        console.log("Item image is", props.item.itemimage);
 
-    }, [props.item.liked]);
+    }, [props.likeditem]);
 
     
     const addorremovefavourite = (e)=>{
@@ -105,6 +108,7 @@ function ItemCard(props){
                         </Link>
                     </Col>
                     <Col>
+                    {JSON.stringify(bgcolor)}
                         <Button
                             variant="light"
                             className = "fa fa-heart"

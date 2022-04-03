@@ -54,27 +54,28 @@ function ItemDescription(props){
                 await setShopName(response.data.name)
                 await setDesc(response.data.description)
                 await setsalescount(response.data.salescount)
-                await setLiked(response.data.liked)
-
-                if(response.data.liked){
-                    console.log("TESTING ------",  response.data.liked);
-        
-                    if(response.data.liked === 'yes'){
-                        setbgcolor('red');
-                    }
-                    else if (response.data.liked=== 'no'){
-                        setbgcolor('#DCDCDC');
-                    }
+                // await setLiked(response.data.liked)
+                axios.post(url.url+'/likeditems', {id:response.data.id})
+                    .then(async response =>{
+                        console.log("Response from liked items description page is",response.data[0].liked)
+                        await setLiked(response.data[0].liked)
+                        if(response.data[0].liked){
+                            console.log("TESTING ------",  response.data[0].liked);
                 
-                }
+                            if(response.data[0].liked === 'yes'){
+                                setbgcolor('red');
+                            }
+                            else{
+                                setbgcolor('#DCDCDC');
+                            }
+                        
+                        }
+                    })
+
 
             })
 
-        axios.get(url.url+'/likeditems')
-            .then(async response =>{
-                console.log("Response from liked items item description page is is",response)
-                await setLikedItems([...response.data])
-            })
+        
 
     },[]);
 
