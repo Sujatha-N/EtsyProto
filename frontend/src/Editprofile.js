@@ -17,14 +17,13 @@ function Editprofile(){
     if(!token){
         history.push("/login")
     }
-    
 
     const config = {
-        bucketName: 'etsy-ecommerce',
+        bucketName: 'reactetsybucket',
         // albumName: 'photos',
-        region: 'us-west-2',
-        accessKeyId: 'AKIA2DYT56ST365MPZ5U',
-        secretAccessKey: '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',
+        region: 'us-east-2',
+        accessKeyId: 'AKIAXBQK7SIGTUFF2MQ6',
+        secretAccessKey: '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',
         // s3url: 'https://etsy-ecommerce.s3.us-west-2.amazonaws.com/'
     }
 

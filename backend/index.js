@@ -6,6 +6,8 @@ app.use(cors());
 var mysql = require('mysql');
 var constants = require("./config.json");
 const jwt = require("jsonwebtoken");
+var aws = require('aws-sdk');
+const generateUploadURL = require('./s3')
 
 
 
@@ -46,22 +48,22 @@ app.post("/usersignup",(req,res) =>{
     })
 })
 
-app.post("/shopsignup",(req,res) =>{
-    console.log(req.body);
-    const username = req.body.username;
-    const email = req.body.email;
+// app.post("/shopsignup",(req,res) =>{
+//     console.log(req.body);
+//     const username = req.body.username;
+//     const email = req.body.email;
     
-    connection.query("INSERT INTO shop (owner,email) VALUES (?,?)", [username,email], (err, result)=>{
-        console.log("USERNAME", username, email)
-        if(err){
-            console.log(err);
-        }
-        else{
-            console.log("Inserted successfully into the shop table: " ,result);
-            res.status(200).send("Inserted successfully into the shop table")
-        }
-    })
-})
+//     connection.query("INSERT INTO shop (owner,email) VALUES (?,?)", [username,email], (err, result)=>{
+//         console.log("USERNAME", username, email)
+//         if(err){
+//             console.log(err);
+//         }
+//         else{
+//             console.log("Inserted successfully into the shop table: " ,result);
+//             res.status(200).send("Inserted successfully into the shop table")
+//         }
+//     })
+// })
 
 
 app.post("/login",(req,res)=>{
@@ -156,7 +158,7 @@ app.get("/shopdetails", (req,res)=>{
             console.log(err)
         }
         if(result.length>0){
-            console.log("Result from shop page is:", result[0]);
+            console.log("Result from shop page for username is:", result[0]);
             let owner = result[0].username
 
             connection.query("SELECT * FROM shop WHERE email = ?", [decoded], (errr,resultt)=>{
@@ -168,17 +170,17 @@ app.get("/shopdetails", (req,res)=>{
                     console.log("Result from shop page is:", resultt[0]);
                     res.send(resultt[0]);
                 }
-                else{
-                    connection.query("INSERT INTO shop (owner,email) VALUES (?,?)", [owner, decoded], (errrr, resulttt)=>{
-                        if(errrr){
-                            console.log(errrr);
-                        }
-                        else{
-                            console.log("Inserted successfully into the user table: " ,resulttt);
-                            res.status(404).send("Shop name is not defined")
-                        }
-                    })
-                }
+                // else{
+                //     connection.query("INSERT INTO shop (owner,email) VALUES (?,?)", [owner, decoded], (errrr, resulttt)=>{
+                //         if(errrr){
+                //             console.log(errrr);
+                //         }
+                //         else{
+                //             console.log("Inserted successfully into the user table: " ,resulttt);
+                //             res.status(404).send("Shop name is not defined")
+                //         }
+                //     })
+                // }
             })
         }
         
@@ -309,11 +311,11 @@ app.post("/shopdetails",(req,res)=>{
     const token = req.header("x-auth-token");
     const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
     console.log("decoded in POST shopdetails API: ", decoded);
-    console.log("REQUEST.BODY.ID IS", req.body.id)
+    console.log("***************REQUEST.BODY.ID IS", req.body.id)
 
     if(req.body.id === '0'){
 
-        connection.query("SELECT * FROM items WHERE email = ?", [decoded], (err,result)=>{
+        connection.query("SELECT * FROM shop WHERE email = ?", [decoded], (err,result)=>{
             if(err){
                 res.send({err: err});
                 console.log(err)
@@ -325,9 +327,10 @@ app.post("/shopdetails",(req,res)=>{
                         res.send({errr: errr});
                         console.log(errr)
                     }
-                    if(result.length>=0){
+                    if(resultt.length>=0){
                         console.log("Result from TOTAL SALES COUNT is:", resultt[0].salescount);
                         let salescount = resultt[0].salescount
+                        // let owneremail = resultt[0].owneremail
                         console.log("DECODED FOR TESTING IS", decoded)
 
                         connection.query("SELECT shopimage,owner FROM shop where email = ?", [decoded], (errrr,resulttt)=>{
@@ -336,12 +339,15 @@ app.post("/shopdetails",(req,res)=>{
                                 console.log(errrr)
                             }
                             if(resulttt.length>0){
-                                console.log("SHOP IMAGE IS", resulttt)
+                                console.log("SHOP IMAGE IS", resulttt[0].shopimage)
                                 let shopimage = resulttt[0].shopimage;
                                 let owner = resulttt[0].owner;
                                 console.log("OWNER IS", resulttt.owner);
-                                res.send({result:result, email:decoded, salescount:salescount, shopimage: shopimage, owner: owner});
+                                res.send({result:result, email:decoded, salescount:salescount, owneremail: decoded, shopimage: shopimage, owner: owner});
+                            }else{
+                                res.status(200).send("NOT FOUND")
                             }
+                            
                         })
                     }
                 })
@@ -366,7 +372,7 @@ app.post("/shopdetails",(req,res)=>{
                     }
                     if(result.length>0){
                         console.log("Result from items Get shop details API is:", result[0]);
-                        connection.query("SELECT SUM(salescount) as salescount FROM items WHERE shopname = ?", [shopname], (errr,resultt)=>{
+                        connection.query("SELECT SUM(salescount) as salescount, email as owneremail FROM items WHERE shopname = ?", [shopname], (errr,resultt)=>{
                             if(errr){
                                 res.send({errr: errr});
                                 console.log(errr)
@@ -374,6 +380,7 @@ app.post("/shopdetails",(req,res)=>{
                             if(result.length>0){
                                 console.log("Result from TOTAL SALES COUNT is:", resultt[0].salescount);
                                 let salescount = resultt[0].salescount
+                                let owneremail = resultt[0].owneremail
                                 connection.query("SELECT shopimage,owner FROM shop where email = ?", [decoded], (errrr,resulttt)=>{
                                     if(errrr){
                                         res.send({errrr: errrr});
@@ -383,7 +390,7 @@ app.post("/shopdetails",(req,res)=>{
                                         console.log("SHOP IMAGE IS", resulttt)
                                         let shopimage = resulttt;
                                         let owner = resulttt.owner;
-                                        res.send({result:result, email:decoded, salescount:salescount, shopimage: shopimage, owner: owner});
+                                        res.send({result:result, email:decoded, salescount:salescount, owneremail: owneremail, shopimage: shopimage, owner: owner});
                                         // res.send({result:result, email:decoded, salescount:salescount, shopimage: resulttt});
                                     }
                                 })
@@ -397,6 +404,24 @@ app.post("/shopdetails",(req,res)=>{
 
     }
 
+})
+
+
+app.get("/shopitems",(req,res)=>{
+    const token = req.header("x-auth-token");
+    const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
+    console.log("decoded in GET shopitems page API: ", decoded);
+
+    connection.query("SELECT * FROM items where email = ?", [decoded],(err,result)=>{
+        if(err){
+            res.send({err: err});
+            console.log(err)
+        }
+        if(result.length>0){
+            console.log("Result from Get shop items page API is:", result[0]);
+            res.send(result);
+        }
+    })
 })
 
 app.get("/shopdetailspage",(req,res)=>{
@@ -416,6 +441,26 @@ app.get("/shopdetailspage",(req,res)=>{
     })
 
 })
+
+app.post("/shopitems",(req,res)=>{
+    const token = req.header("x-auth-token");
+    const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
+    console.log("decoded in GET shopitems page API: ", decoded);
+
+    connection.query("SELECT * FROM items where email = ?", [req.body.owneremail],(err,result)=>{
+        if(err){
+            res.send({err: err});
+            console.log(err)
+        }
+        if(result.length>0){
+            console.log("Result from Get shopitems page API is:", result[0]);
+            res.send(result);
+        }
+    })
+
+})
+
+
 
 
 app.get("/listofitems",(req,res)=>{
@@ -492,6 +537,7 @@ app.post("/checkshopname",(req,res)=>{
         }
         if(result.length>0){
             console.log("inside check shop name")
+            console.log("result VVVVV is", result);
             console.log("Shop Name Already exists");
             res.status(404).send("Shop Name already exists")
         }
@@ -506,32 +552,44 @@ app.post("/updateshopname",(req,res)=>{
     console.log(req.body);
     const token = req.header("x-auth-token");
     const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
-    console.log("decoded in POST update shop name API: ", decoded);
+    console.log("decoded in POST update shop name API: ", decoded, req.body.name);
 
-    connection.query("UPDATE shop SET name = ? where email = ?", [req.body.name, decoded], (err,result)=>{
-        if(err){
-            res.send({err: err});
-            console.log(err)
+    connection.query("SELECT username from user where email = ?", [decoded], (errr,resu)=>{
+        if(errr){
+            res.send({errr: errr});
+            console.log(errr)
         }
-        if(result){
-            connection.query("UPDATE items SET shopname = ? where email = ?", [req.body.name, decoded], (err,result)=>{
+        if(resu){
+            console.log("result from user table is", resu)
+            const owner = resu[0].username
+            connection.query("INSERT INTO shop (name, owner, email) values(?,?,?)", [req.body.name,owner,decoded], (err,result)=>{
                 if(err){
                     res.send({err: err});
                     console.log(err)
                 }
                 if(result){
-                    res.status(200).send("Updated Successfully !")
+                    connection.query("UPDATE items SET shopname = ? where email = ?", [req.body.name, decoded], (error,resultt)=>{
+                        if(error){
+                            res.send({error: error});
+                            console.log(error)
+                        }
+                        if(resultt){
+                            res.status(200).send("Updated Successfully !")
+                        }
+                    })
                 }
             })
+
         }
     })
+    
 })
 
 app.post("/additem",(req,res)=>{
     console.log(req.body);
     const token = req.header("x-auth-token");
     const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
-    console.log("decoded in POST update shop name API: ", decoded);
+    console.log("decoded in POST add item name API: ", decoded);
 
     connection.query("SELECT iname FROM items WHERE email = ? AND iname = ?", [decoded, req.body.itemname], (err,result)=>{
         if(err){
@@ -542,20 +600,24 @@ app.post("/additem",(req,res)=>{
         if(result.length===0){
             console.log("Inside adding the item")
 
-            connection.query("SELECT name from shop WHERE email = ?", [decoded], (err,result)=>{
-                if(err){
-                    res.send({err: err});
-                    console.log(err)
+            connection.query("SELECT name from shop WHERE email = ?", [decoded], (error,shopresult)=>{
+                if(error){
+                    res.send({error: error});
+                    console.log(error)
                 }
-                if(result){
-                    const shopname = result
+                if(shopresult){
+                    const shopname = shopresult[0].name
+
+                    console.log("SHOP NAME OBJECT IS", shopresult[0].name)
+
+
                     let id = Math.random()*(1000);
-                    connection.query("INSERT INTO items (id, owner,iname, quantity, price_currency, price, email, itemimage, shopname, category, description) VALUES (?,?,?,?,?,?,?,?,?,?,?)", [id, req.body.owner,req.body.itemname, req.body.quantity,req.body.price_currency,req.body.price,decoded, req.body.itemimage, shopname, req.body.category, req.body.description], (err,result)=>{
-                        if(err){
-                            res.send({err: err});
-                            console.log(err)
+                    connection.query("INSERT INTO items (id, owner,iname, quantity, price_currency, price, email, itemimage, shopname, category, description) VALUES (?,?,?,?,?,?,?,?,?,?,?)", [id, req.body.owner,req.body.itemname, req.body.quantity,req.body.price_currency,req.body.price,decoded, req.body.itemimage, shopname, req.body.category, req.body.description], (errmsg,insertresult)=>{
+                        if(errmsg){
+                            res.send({errmsg: errmsg});
+                            console.log(errmsg)
                         }
-                        if(result){
+                        if(insertresult){
                             console.log("Item added successfully")
                             res.status(200).send("Item is added successfully")
                         }
@@ -609,7 +671,16 @@ app.post("/addtofavourites",(req,res) =>{
         }
         else{
             console.log("Inserted successfully into the favourites table: " ,result);
-            res.status(200).send("Inserted successfully into the favourites table")
+            connection.query("UPDATE items SET liked = 'yes' where id = ? ",[req.body.itemid], (error, itemsresult)=>{
+                if(error){
+                    console.log(error);
+                }
+                else{
+                    console.log("UPDATED successfully into the items table: " ,itemsresult);
+                    
+                    res.status(200).send("Inserted successfully into the favourites table")
+                }
+            })
         }
     })
 })
@@ -628,7 +699,16 @@ app.post("/removefromfavourites",(req,res) =>{
         }
         else{
             console.log("Deleted successfully from the favourites table: " ,result);
-            res.status(200).send("Deleted successfully from the favourites table")
+            connection.query("UPDATE items SET liked = 'no' where id = ? ",[req.body.itemid], (error, itemsresult)=>{
+                if(error){
+                    console.log(error);
+                }
+                else{
+                    console.log("UPDATED successfully into the items table: " ,itemsresult);
+                    
+                    res.status(200).send("Deleted successfully from the favourites table")
+                }
+            })
         }
     })
 })
@@ -664,7 +744,7 @@ app.post("/favouritesid",(req,res)=>{
         }
         if(result.length>0){
             console.log("Result from Get favourites page API is:", result[0]);
-            res.send(result[0]);
+            res.send(result[0].liked);
         }
         if(result.length===0){
             console.log("Not in favourites");
@@ -740,7 +820,7 @@ app.post("/orders",(req,res)=>{
             console.log(err)
         }
         if(result.length>0){
-            orderid = result[0].id;
+            orderid = result[0].purchaseid;
             console.log("ID from purchases table is",orderid)
             connection.query("INSERT INTO orders (orderid,ordername,orderquantity,orderprice,orderitemid, orderimage) VALUES (?,?,?,?,?,?)", [orderid,req.body.ordername, req.body.orderquantity, req.body.orderprice, req.body.orderitemid, req.body.orderimage], (err,result)=>{
                 if(err){
@@ -756,10 +836,7 @@ app.post("/orders",(req,res)=>{
         if(result.length===0){
             res.send("No purchases done")
         }
-    })
-
-
-    
+    }) 
 
 })
 
@@ -787,46 +864,62 @@ app.post("/updatequantity",(req,res)=>{
     console.log("decoded in POST update quantity API: ", decoded);
     let updatequantity = null ;
 
-    connection.query("SELECT orderquantity FROM orders where orderitemid = ?", [req.body.orderitemid],(err,result)=>{
-        if(err){
-            res.send({err: err});
-            console.log(err)
+    console.log("ORDER ITEM NAME IS", req.body.ordername)
+    connection.query("SELECT * FROM purchase where useremailid = ? ORDER BY purchasedate desc", [decoded],(purchaseerror,purchaseresult)=>{
+        if(purchaseerror){
+            res.send({purchaseerror: purchaseerror});
+            console.log(purchaseerror)
         }
-        if(result.length>0){
-            console.log("Result for quantity from orders is:", result[0].orderquantity);
-            connection.query("SELECT quantity FROM items where id = ?", [req.body.orderitemid],(error,resultnew)=>{
-                if(error){
-                    res.send({error: error});
-                    console.log(error)
+        if(purchaseresult.length>0){
+            orderid = purchaseresult[0].purchaseid;
+            console.log("ID from purchases table is",orderid)
+            connection.query("SELECT orderquantity FROM orders where orderid = ? and ordername = ?", [orderid, req.body.ordername],(err,result)=>{
+                if(err){
+                    res.send({err: err});
+                    console.log(err)
                 }
-                if(resultnew.length>0){
-                    console.log("Result for quantity from items is:", resultnew[0].quantity);
-                    updatequantity = resultnew[0].quantity - result[0].orderquantity
-                    console.log("NEW QUANTITY IS", updatequantity)
-                    connection.query("UPDATE items SET quantity = ? where id = ?", [updatequantity, req.body.orderitemid], (errr,resultt)=>{
-                        if(errr){
-                            res.send({errr: errr});
-                            console.log(errr)
+                if(result.length>0){
+                    console.log("Result for quantity from orders is:", result[0].orderquantity);
+                    connection.query("SELECT quantity FROM items where id = ?", [req.body.orderitemid],(error,resultnew)=>{
+                        if(error){
+                            res.send({error: error});
+                            console.log(error)
                         }
-                        if(resultt){
-                            let salescount = result[0].orderquantity
-                            connection.query("UPDATE items SET salescount = ? where id = ?", [salescount, req.body.orderitemid], (errrr,resulttt)=>{
-                                if(errrr){
+                        if(resultnew.length>0){
+                            console.log("Result for quantity from items is:", resultnew[0].quantity);
+                            updatequantity = resultnew[0].quantity - result[0].orderquantity
+                            console.log("NEW QUANTITY IS", updatequantity)
+                            connection.query("UPDATE items SET quantity = ? where id = ?", [updatequantity, req.body.orderitemid], (errr,resultt)=>{
+                                if(errr){
                                     res.send({errr: errr});
                                     console.log(errr)
                                 }
-                                if(resulttt){
-                                    res.status(200).send("Updated quantity and salescount Successfully !")
+                                if(resultt){
+                                    let salescount = result[0].orderquantity
+                                    connection.query("UPDATE items SET salescount = ? where id = ?", [salescount, req.body.orderitemid], (errrr,resulttt)=>{
+                                        if(errrr){
+                                            res.send({errr: errr});
+                                            console.log(errr)
+                                        }
+                                        if(resulttt){
+                                            res.status(200).send("Updated quantity and salescount Successfully !")
+                                        }
+                                    })
                                 }
                             })
                         }
                     })
                 }
+                else{
+                    res.send("order not found");
+                }
             })
+            
+        }
+        if(purchaseresult.length===0){
+            res.send("No purchases done")
         }
     })
-
-    
 })
 
 app.get("/itemslist",(req,res)=>{
@@ -865,6 +958,13 @@ app.post("/pricerange",(req,res)=>{
         }
     })
 })
+
+// app.get('/s3Url', async(req, res) => {
+//     console.log(req.query.imagename)
+//     const url = await generateUploadURL.generateUploadURL(req.query.imagename)
+//     console.log(url)
+//     res.send({url})
+// })
 
 
 app.listen(4000, ()=>{

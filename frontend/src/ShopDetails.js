@@ -9,15 +9,15 @@ import ShopItemCard from './ShopItemCard';
 import { uploadFile } from 'react-s3';
 import url from './config.json';
 
+
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
-
 const config = {
-    bucketName: 'etsy-ecommerce',
+    bucketName: 'reactetsybucket',
     // albumName: 'photos',
-    region: 'us-west-2',
-    accessKeyId: 'AKIA2DYT56ST365MPZ5U',
-    secretAccessKey: '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',
+    region: 'us-east-2',
+    accessKeyId: 'AKIAXBQK7SIGTUFF2MQ6',
+    secretAccessKey: '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',
     // s3url: 'https://etsy-ecommerce.s3.us-west-2.amazonaws.com/'
 }
 
@@ -57,40 +57,71 @@ function ShopDetails(props){
         axios.defaults.headers.common["x-auth-token"] = token;
         axios.post(url.url+'/shopdetails', {id: props.match.params.id})
             .then(async(response)=>{
-                console.log("RESPONSE LIST OF SHOP ITEMS IS ",response.data, response.data.email);
-                await setItems(response.data.result);
-                if(response.data.result.length>0){
+                console.log("RESPONSE LIST OF SHOP ITEMS IS ",response.data.email, response.data.owneremail);
+                if(response.data && response.data.result && response.data.result.length>0){
+        
                     await setShopname(response.data.result[0].shopname)
-                    await setShopemail(response.data.result[0].email)
-                    // await setshpimg(response.data.shopimage[0].shopimage)
-                }
-                
-                await setShopOwner(response.data.owner)
-                await setUseremail(response.data.email)
-                await settotalsalescount(response.data.salescount)
-               
-                if(response.data.result.length>0){
-                    if(response.data.result[0].email == response.data.email){
-                        console.log("SETTING IS OWNER TRUe");
+                    await setShopemail(response.data.owneremail)
+                    await setShopOwner(response.data.result[0].owner)
+                    await setUseremail(response.data.email)
+                    await settotalsalescount(response.data.salescount)
+                    if(response.data.owneremail == response.data.email){
+                        console.log("SETTING IS OWNER TRUe", response.data.result[0].email, response.data.email);
                         setisOwner(true)
+                        axios.post(url.url+'/shopitems', {owneremail: response.data.owneremail})
+                            .then(async(response)=>{
+                                console.log("RESPONSE LIST OF SHOP ITEMS IS ",response.data);
+                                if(response.data){
+                                    await setItems(response.data)
+                                }else{
+                                    await setItems([])
+                                }   
+                            });
                     }
                     else{
                         console.log("SETTING IS OWNER FALSE");
                         setisOwner(false)
+
+                        axios.post(url.url+'/shopitems', {owneremail: response.data.owneremail})
+                            .then(async(response)=>{
+                                console.log("RESPONSE LIST OF SHOP ITEMS IS ",response.data);
+                                if(response.data){
+                                    await setItems(response.data)
+                                }else{
+                                    await setItems([])
+                                }   
+                            });
                     }
-                } 
+                }else{
+                    history.push("/sell");
+                }   
+            });
+
+        axios.defaults.headers.common["x-auth-token"] = token;
+        axios.get(url.url+'/shopitems')
+            .then(async (response)=>{
+                console.log("RESPONSE FROM SHOP ITEMS IS", response);
+                if(response){
+                    if(response.status===200){
+                        await setItems(response.data);
+                    }
+                }
+                else{
+                    history.push('/shopdetails/0')
+                }
                 
             });
 
-            console.log("SHOP EMAIL IS", shopemail, useremail)
 
-    }, []);
+        console.log("SHOP EMAIL IS", shopemail, useremail)
+
+    }, [props.match.params.id]);
 
 
     
 
     const imageupload = (e)=>{
-        // console.log("Target image upload file is",e.target.files[0])
+        console.log("Target image upload file is",e.target.files[0])
         uploadFile(e.target.files[0], config)
             .then((data)=>{
                 console.log("Response from react S3 is", data.location);
@@ -102,7 +133,7 @@ function ShopDetails(props){
     }
 
     const uploadshopimage = (e)=>{
-        // console.log("Target image upload file is",e.target.files[0])
+        console.log("Target image upload file is",e.target.files[0])
         uploadFile(e.target.files[0], config)
             .then((data)=>{
                 console.log("Response from react S3 is", data.location);
@@ -115,11 +146,11 @@ function ShopDetails(props){
 
     const saveimage = (e)=>{
         e.preventDefault();
-        console.log("INSIDE SAVE IMAGE")
+        console.log("INSIDE SAVE IMAGE FOR SHOP IS")
         axios.defaults.headers.common["x-auth-token"] = token;
             axios.post(url.url+'/updateshopimage', {shopimage:shopimage})
             .then(async(response)=>{
-                console.log("RESPONSE FROM SAVE IMAGE IS",response);
+                console.log("RESPONSE FOR SAVE SHOP IMAGE IS",response);
             history.push("/shopdetails/0")
         });
     }
@@ -154,7 +185,8 @@ function ShopDetails(props){
 
     return(
         <div style={{marginTop:"150px"}}>
-            {shopemail === useremail && isOwner == false ? setisOwner(true): null}
+
+            {/* {shopemail === useremail && isOwner == false ? setisOwner(true): null} */}
             <div>
                 {isOwner && 
                     <Button style={{marginLeft:"1000px"}} className = "w-5 mt-1" type="submit" onClick = {()=>setShow(true)}>Add an Item</Button>
@@ -166,6 +198,8 @@ function ShopDetails(props){
                 <br/>
                 <b>List of items:</b> 
                 <Row>
+                    {/* {JSON.stringify(items)}  */}
+                    {/* {JSON.stringify(isOwner)} */}
                     {items.map((item)=>{
                         return (
                         <Col>

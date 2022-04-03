@@ -45,8 +45,12 @@ export const cartreducer = (state = initialState, action) =>{
             return{
                 cart : newcart
             }
+
+        case "CLEAR_CART":
+            console.log("inside clear cart")
+            return state;
         
-      return state;
+        return state;
             
     }
     return state;

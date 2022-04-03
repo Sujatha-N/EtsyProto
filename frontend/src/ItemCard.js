@@ -23,26 +23,27 @@ function ItemCard(props){
 
 
     const[bgcolor, setbgcolor] = useState('#DCDCDC');
-    const[liked, setLiked]= useState('no');
+    const[liked, setLiked]= useState(props.item.liked);
 
 
-    console.log("LIKED ITEMS IN THE ITEM CARD IS", props.likeditem[0])
+    console.log("LIKED ITEMS IN THE ITEM CARD IS", props, props.item.liked)
 
     useEffect((e) => {
 
-        if(props.likeditem[0]){
+        if(props){
+            console.log("TESTING ------",  props.item.id);
 
-            if(props.likeditem[0].itemid === props.item.id && props.likeditem[0].liked === 'yes'){
+            if(props.item.liked === 'yes'){
                 setbgcolor('red');
             }
-            else{
-                setbgcolor('#DCDCDC')
+            else if (props.item.liked === 'no'){
+                setbgcolor('#DCDCDC');
             }
         
         }
         // console.log("Item image is", props.item.itemimage);
 
-    });
+    }, [props.item.liked]);
 
     
     const addorremovefavourite = (e)=>{
@@ -51,7 +52,7 @@ function ItemCard(props){
         axios.defaults.headers.common["x-auth-token"] = token;
         axios.post(url.url+'/favouritesid', {itemid:props.item.id})
             .then((response)=>{
-                console.log("Liked data is",response.data);
+                console.log("Liked data is --------",response.data);
                 setLiked(response.data);
                 if(liked==='yes'){
                     setLiked('no')
@@ -87,10 +88,13 @@ function ItemCard(props){
 
 
     return(
+        
         <Card classname="my-3 p-3 rounded" style={{ width: "18rem", marginTop: "50px"  }}>
             {/* <Link to={`/getItems/${items.item_id}`}>
                 <Card.Img src={} variant="top" />
             </Link> */}
+            {/* {JSON.stringify(bgcolor)} */}
+            {/* <div>Liked : {JSON.stringify(liked)}</div> */}
             <Card.Body>
                 <Row>
                     <Col>

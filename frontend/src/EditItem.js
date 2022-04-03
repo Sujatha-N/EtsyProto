@@ -9,12 +9,13 @@ import url from './config.json';
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 const config = {
-    bucketName: 'etsy-ecommerce',
+    bucketName: 'upload-s3-bucket-1',
     // albumName: 'photos',
     region: 'us-west-2',
-    accessKeyId: 'AKIA2DYT56ST365MPZ5U',
-    secretAccessKey: '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',
-    // s3url: 'https://etsy-ecommerce.s3.us-west-2.amazonaws.com/'
+    accessKeyId: 'AKIAXBQK7SIGUS5YAOP7',
+    secretAccessKey: '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',
+    // s3url: 'https://reactetsybucket.s3.us-east-2.amazonaws.com/',
+    
 }
 
 

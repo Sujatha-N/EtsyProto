@@ -24,11 +24,12 @@ function ItemDescription(props){
     const[priceCurrency,setPriceCurrency] = useState('')
     const[price,setPrice] = useState('')
     const[message,setMessage] = useState(false)
-    const[liked, setliked]= useState('no')
+    const[liked, setLiked]= useState()
     const[shopname,setShopName]= useState('')
     const[outofstock,setoutofstock] = useState(false)
     const[desc,setDesc] = useState()
     const[salescount,setsalescount] = useState()
+    const[bgcolor, setbgcolor] = useState()
 
     let dispatchEvent = useDispatch();
 
@@ -53,7 +54,22 @@ function ItemDescription(props){
                 await setShopName(response.data.name)
                 await setDesc(response.data.description)
                 await setsalescount(response.data.salescount)
+                await setLiked(response.data.liked)
+
+                if(response.data.liked){
+                    console.log("TESTING ------",  response.data.liked);
+        
+                    if(response.data.liked === 'yes'){
+                        setbgcolor('red');
+                    }
+                    else if (response.data.liked=== 'no'){
+                        setbgcolor('#DCDCDC');
+                    }
+                
+                }
+
             })
+
         axios.get(url.url+'/likeditems')
             .then(async response =>{
                 console.log("Response from liked items item description page is is",response)
@@ -114,7 +130,7 @@ function ItemDescription(props){
             
             <Row>
                 <Col>
-                    <ItemDescriptionItemCard item= {item} likeditem = {likeditem}/>
+                    <ItemDescriptionItemCard item= {item} bgcolor={bgcolor}/>
                 </Col>
             </Row>
             <Row>

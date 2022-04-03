@@ -1,8 +1,8 @@
 {
     "DB":{
-        "host":"etsy-database.cimyovuoh49k.us-west-1.rds.amazonaws.com",
+        "host":"etsydatabase.cfrel01uyhoo.us-west-1.rds.amazonaws.com",
         "username": "admin",
-        "password":"etsyadmin",
+        "password":"password",
         "port":"3306",
         "database":"Etsy"
     },

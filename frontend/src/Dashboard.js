@@ -11,11 +11,11 @@ window.Buffer = window.Buffer || require("buffer").Buffer;
 
 
 const config = {
-    bucketName: 'etsy-ecommerce',
+    bucketName: 'reactetsybucket',
     // albumName: 'photos',
-    region: 'us-west-2',
-    accessKeyId: 'AKIA2DYT56ST365MPZ5U',
-    secretAccessKey: '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',
+    region: 'us-east-2',
+    accessKeyId: 'AKIAXBQK7SIGTUFF2MQ6',
+    secretAccessKey: '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',
     // s3url: 'https://etsy-ecommerce.s3.us-west-2.amazonaws.com/'
 }
 
@@ -52,7 +52,7 @@ function Dashboard(props){
             await setLikedItems([...response.data])
         })
         
-    },[instockitems]);
+    },[instockitems, sorted, pricerangeitems]);
 
     console.log("LIKED ITEMS IS", likeditems)
 
@@ -72,7 +72,6 @@ function Dashboard(props){
             
     })
 
-    
 
     const imageupload = (e)=>{
         // console.log("Target image upload file is",e.target.files[0])
@@ -224,57 +223,56 @@ function Dashboard(props){
 
     const zToh = (e) =>{
         e.preventDefault();
-        setPricerange(true)
         axios.defaults.headers.common["x-auth-token"] = token;
+        setPricerangeitems([])
         axios.post(url.url+'/pricerange', {min:0, max:99})
             .then(async response =>{
                 console.log("Response in price range ",response.data)
                 setPricerangeitems(response.data)
             })
+        setPricerange(true)
     }
 
     const hToF = (e) =>{
         e.preventDefault();
-        setPricerange(true)
+        setPricerangeitems([])
         axios.defaults.headers.common["x-auth-token"] = token;
         axios.post(url.url+'/pricerange', {min:100, max:499})
             .then(async response =>{
                 console.log("Response in price range ",response.data)
                 setPricerangeitems(response.data)
             })
+        setPricerange(true)
     }
 
     const FToT = (e) =>{
         e.preventDefault();
-        setPricerange(true)
+        setPricerangeitems([])
         axios.defaults.headers.common["x-auth-token"] = token;
         axios.post(url.url+'/pricerange', {min:500, max:999})
             .then(async response =>{
                 console.log("Response in price range ",response.data)
                 setPricerangeitems(response.data)
             })
+        setPricerange(true)
     }
 
     const Tplus = (e) =>{
         e.preventDefault();
-        setPricerange(true)
+        setPricerangeitems([])
         axios.defaults.headers.common["x-auth-token"] = token;
         axios.post(url.url+'/pricerange', {min:1000, max:1000000000000000})
             .then(async response =>{
                 console.log("Response in price range ",response.data)
                 setPricerangeitems(response.data)
             })
+        setPricerange(true)
     }
 
     const noneofthem = (e) =>{
         e.preventDefault();
         setPricerange(false)
     }
-
-
-
-
-
 
 
     return(
@@ -327,12 +325,15 @@ function Dashboard(props){
 
             <div>
                 <Row>
+                    {/* {JSON.stringify(filteredItems)} */}
                     {!pricerange && !sortflag && filteredItems.map((item)=>{
+
                         console.log("PRICE RANGE INSIDE FILTERED IS", pricerange)
                         console.log("ITEM IN DASHBOARD IS", item.id)
                         const likeditem = likeditems.filter(likeitem=>{
-                            console.log("ITEM ID INSIDE FILTER IS", parseInt(likeitem.itemid), item.id)
-                            if(likeitem.itemid===item.id){
+                            console.log("ITEM ID INSIDE FILTER IS", parseInt(likeitem.itemid), item.id, item.iname)
+                            if(parseInt(likeitem.itemid)===item.id){
+                                console.log("Inside equals likeditem");
                                 return(
                                     likeitem
                                 );
@@ -342,7 +343,8 @@ function Dashboard(props){
                         console.log("LIKED ITEM IS", likeditem)
                         return (
                             <Col>
-                                <ItemCard item= {item} likeditem = {likeditem}/>
+                                {/* {JSON.stringify(likeditem)} */}
+                                <ItemCard item= {item}/>
                             </Col>
                         );
                     }
@@ -350,17 +352,18 @@ function Dashboard(props){
                     
                 </Row>
                 <Row>
+                    {/* {JSON.stringify(sorted)} */}
                     {!pricerange && sortflag && sorted.map((item)=>{
                         // console.log("ITEM IN DASHBOARD IS", item.id)
                         console.log("PRICE RANGE INSIDE SORTED IS", pricerange)
                         const likeditem = likeditems.filter(likeitem=>{
                             // console.log("ITEM ID INSIDE FILTER IS", parseInt(likeitem.itemid), item.id)
-                            if(likeitem.itemid===item.id){
-                                // console.log("INSIDE EQUALS");
+                            if(parseInt(likeitem.itemid)===item.id){
+                                console.log("INSIDE EQUALS");
                                 return(
                                     likeitem
                                 );
-                            }   
+                            }
                             
                         })
                         console.log("LIKED ITEM IN DASHBOARD IS", likeditem)
@@ -376,12 +379,13 @@ function Dashboard(props){
                 </Row>
 
                 <Row>
+                    {/* {JSON.stringify(pricerangeitems)} */}
                     {!sortflag && pricerange && pricerangeitems.map((item)=>{
-                        // console.log("ITEM IN DASHBOARD IS", item.id)
+                        console.log("ITEM IN DASHBOARD IS", item.id)
                         const likeditem = likeditems.filter(likeitem=>{
                             // console.log("ITEM ID INSIDE FILTER IS", parseInt(likeitem.itemid), item.id)
-                            if(likeitem.itemid===item.id){
-                                // console.log("INSIDE EQUALS");
+                            if(parseInt(likeitem.itemid)===item.id){
+                                console.log("INSIDE EQUALS");
                                 return(
                                     likeitem
                                 );

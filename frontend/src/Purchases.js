@@ -32,7 +32,7 @@ function Purchases(){
                 return(
                     <Row>
                         <Col>
-                            <Link to={`/orders/${item.id}`}>Order ID: {item.id}</Link>
+                            <Link to={`/orders/${item.purchaseid}`}>Order ID: {item.purchaseid}</Link>
                         </Col>
                         <Col styles={{width:"200px"}}>
                             Total items ordered : {item.itemstotal}

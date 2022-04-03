@@ -22,26 +22,19 @@ function ItemDescriptionItemCard(props){
     const currency = currencyreducer.currencyreducer.currency;
 
 
-    const[bgcolor, setbgcolor] = useState('#DCDCDC');
-    const[liked, setLiked]= useState('no');
+    const[bgcolor, setbgcolor] = useState(props.bgcolor);
+    const[liked, setLiked]= useState(props.liked);
 
 
-    console.log("CHECKING - 1 is", props.likeditem)
+    console.log("CHECKING - 1 is", props)
 
     useEffect(() => {
-        console.log("CHECKING - 2 is", props.likeditem[0])
-        if(props.likeditem[0]){
-
-            console.log("CHECKING - 3", props.likeditem[0].itemid, props.item.id)
-
-            if(props.likeditem[0].itemid === props.item.id && props.likeditem[0].liked === 'yes'){
-                console.log("CHECKING - 4");
-                setbgcolor('red');
-            }
-            else{
-                setbgcolor('#DCDCDC')
-            }
-        
+        console.log("CHECKING - 2 is", props.bgcolor)
+        if(props.bgcolor === 'red'){
+            setbgcolor('red');
+        }
+        else{
+            setbgcolor('#DCDCDC')
         }
 
     });
@@ -50,11 +43,11 @@ function ItemDescriptionItemCard(props){
     const addorremovefavourite = (e)=>{
         e.preventDefault();
 
-        axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post(url.url+'/favouritesid', {itemid:props.item.id})
-            .then((response)=>{
-                console.log("Liked data is",response.data);
-                setLiked(response.data);
+        // axios.defaults.headers.common["x-auth-token"] = token;
+        // axios.post(url.url+'/favouritesid', {itemid:props.item.id})
+        //     .then((response)=>{
+        //         console.log("Liked data is",response.data);
+        //         setLiked(response.data);
                 if(liked==='yes'){
                     setLiked('no')
                     setbgcolor('#DCDCDC')
@@ -84,7 +77,7 @@ function ItemDescriptionItemCard(props){
         
                 }
         
-            })
+            // })
     }
 
 
@@ -103,11 +96,12 @@ function ItemDescriptionItemCard(props){
                         {/* </Link> */}
                     </Col>
                     <Col>
+                        {/* {JSON.stringify(bgcolor)} */}
                         <Button
                             variant="light"
                             className = "fa fa-heart"
                             style={{color: bgcolor, background: "none", marginLeft: "200px"}}
-                            onClick = {addorremovefavourite}
+                            // onClick = {addorremovefavourite}
                         >
                         </Button>
                     </Col>

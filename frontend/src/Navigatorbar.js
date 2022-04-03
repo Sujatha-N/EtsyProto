@@ -4,17 +4,22 @@ import { Navbar, NavDropdown, Nav, Container, Button, Form, FormControl} from 'r
 import axios from 'axios';
 import url from './config.json';
 
+
 function Navigatorbar(props){
-  const token = JSON.parse(localStorage.getItem('token'));
-  let history = useHistory();
-  console.log("Token in navbar is",token)
-  if(!token){
-    history.push("/login")
-  }
   const[items,setItems] = useState([]);
   const ownid = 0;
 
-  const shop = (e)=>{
+  const token = JSON.parse(localStorage.getItem('token'));
+  console.log("Token in navbar is",token)
+  let history = useHistory();
+  if(!token){
+    history.push("/login")
+  } 
+
+  const[gotosell, setgotosell] = useState(false)
+
+  
+  const checkshop = (e)=>{
     e.preventDefault();
     axios.defaults.headers.common["x-auth-token"] = token;
     console.log("Token in Nav bar is", token)
@@ -22,13 +27,15 @@ function Navigatorbar(props){
       .then((response)=>{
         console.log("Response from axios shop details from navbar is",response.data.name);
         if(response.data.name !== ''){
-          console.log("Inside shop details response");
-          history.push(`/shopdetails/${ownid}`)
+          // setgotosell(false)
+          history.push('/shopdetails/0')
         }
+        
       })
       .catch((err)=>{
         console.log("INSIDE CATCH ");
-        history.push("/sell");
+        // setgotosell(true)
+        history.push('/sell')
     })
   }
 
@@ -62,7 +69,8 @@ function Navigatorbar(props){
               </Form>
 
               <Nav className="me-auto" >
-              <i class="fa fa-shopping-bag" aria-hidden="true" onClick={shop}></i>
+              <i class="fa fa-shopping-bag" aria-hidden="true" onClick={checkshop}></i>
+                
               </Nav>
 
               <Nav className="me-auto" >
