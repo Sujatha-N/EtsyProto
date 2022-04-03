@@ -14,9 +14,9 @@ function Footer(){
     const dispatchEvent = useDispatch();
 
     const[show,setShow] = useState(false);
-    const[country,setCountry] = useState([]);
-    const[language, setLanguage] = useState([]);
-    const[currency, setCurrency] = useState([]);
+    const[country,setCountry] = useState('United States');
+    const[language, setLanguage] = useState('English');
+    const[currency, setCurrency] = useState('Dollars');
 
     const handlecountry = (e) =>{
         e.preventDefault();
@@ -98,7 +98,7 @@ function Footer(){
             <Container>
                 {/* <Navbar.Brand>Etsy</Navbar.Brand> */}
                 <Nav className="me-auto">
-                    <Nav.Link onClick={()=>setShow(true)} style={{marginLeft: "500px"}}>@ {country}</Nav.Link>
+                    <Nav.Link onClick={()=>setShow(true)} style={{marginLeft: "500px"}}>{country}</Nav.Link>
                     <Nav.Link onClick={()=>setShow(true)}>{language}</Nav.Link>
                     <Nav.Link onClick={()=>setShow(true)}>{currency}</Nav.Link>
                     
