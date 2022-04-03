@@ -36,42 +36,42 @@ function Cart(){
 
     const checkouthandler = (e) =>{
         e.preventDefault();
-        axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post(url.url+'/purchase', {itemstotal:cart.length})
-            .then((response)=>{
-                console.log("Inserted data is",response);
-                if(response.status===200){
-                    console.log("Inserted into purchases and moves on to inserting in orders")
-                    {cart.map((item)=>{
-                        console.log("ITEM IN AXIOS LOOP IS", item)
-                        console.log("QUANTITY SENXDING THROUGH CART IS", item.qty)
-                        return(
-                            axios.post(url.url+'/orders', {ordername:item.iname, orderquantity: item.qty, orderprice: item.price, orderitemid: item.id, orderimage: item.itemimage})
-                            .then((response)=>{
-                                console.log(response);
-                                if(response.status === 200){
-
-                                    {cart.map((item)=>{
-                                        console.log("ITEM IN UPDATE QUANTITY LOOP IS", item)
-                                        return(
-                                            axios.post(url.url+'/updatequantity', {orderitemid: item.id, ordername: item.iname})
-                                                .then((response)=>{
-                                                    console.log("Updated quantity for items")
-                                                })
-                                        );
-                                    })}
-                                }
-                            })
-                        );
-                    })}
-                    dispatchEvent({type:"CLEAR_CART"})
-            }
-            })
         axios.get(url.url+'/editprofile')
             .then((response) =>{
-                console.log(response)
-                if(response.data.address!=null){
-                    history.push("/checkout");
+                console.log("RESPONSE FROM EDIT PROFILE ADDRESS IS -----------------", response.data.address)
+                if(response.data.address){
+                    axios.defaults.headers.common["x-auth-token"] = token;
+                    axios.post(url.url+'/purchase', {itemstotal:cart.length})
+                        .then((response)=>{
+                            console.log("Inserted data is",response);
+                            if(response.status===200){
+                                console.log("Inserted into purchases and moves on to inserting in orders")
+                                {cart.map((item)=>{
+                                    console.log("ITEM IN AXIOS LOOP IS", item)
+                                    console.log("QUANTITY SENDING THROUGH CART IS", item.qty)
+                                    return(
+                                        axios.post(url.url+'/orders', {ordername:item.iname, orderquantity: item.qty, orderprice: item.price, orderitemid: item.id, orderimage: item.itemimage})
+                                        .then((response)=>{
+                                            console.log(response);
+                                            if(response.status === 200){
+
+                                                {cart.map((item)=>{
+                                                    console.log("ITEM IN UPDATE QUANTITY LOOP IS", item)
+                                                    return(
+                                                        axios.post(url.url+'/updatequantity', {orderitemid: item.id, ordername: item.iname})
+                                                            .then((response)=>{
+                                                                console.log("Updated quantity for items")
+                                                            })
+                                                    );
+                                                })}
+                                            }
+                                        })
+                                    );
+                                })}
+                                dispatchEvent({type:"CLEAR_CART"})
+                        }
+                        })
+                        history.push("/checkout");
                 }
                 else{
                     setaddmsg(true);
