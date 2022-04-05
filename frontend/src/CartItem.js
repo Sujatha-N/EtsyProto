@@ -10,8 +10,10 @@ function CartItem(props){
     const[quantity, setQuantity] = useState(props.item.quantity);
     const cartreducer = useSelector((state)=> state.cartreducer);
     const{cart} = cartreducer;
+    const[qty, setqty] = useState(cart.qty)
+    
 
-    const qty = cart.qty;
+    // const qty = cart.qty;
 
     console.log("PROPS FROM CART PAGE IS", props.item)
 
@@ -59,14 +61,24 @@ function CartItem(props){
 
                 <p style={{marginLeft:"50px"}}><b>Price: </b>{currency} {props.item.price}</p>
 
-                <div style={{marginLeft:"50px"}}>
+                {/* <div style={{marginLeft:"50px"}}>
                     <label><b>Quantity: {props.item.qty}</b></label>
+                </div> */}
+                <div>
+                    <label><b>Quantity: </b></label>
+                    <input id="quantity" type="number" value={props.item.qty} min="0"
+                    onChange={(e)=>{
+                        setqty(e.target.value);
+                        dispatchEvent({type:"CHANGE_QUANTITY", payload:{item:props.item, qty:qty}})
+                        // checkquantity();
+                    }}></input>
                 </div>
                 <div>
-                <button onClick = {removefromcart} style ={{marginLeft:"10px"}}>
-                        Remove from Cart
-                </button>
+                    <button onClick = {removefromcart} style ={{marginLeft:"10px"}}>
+                            Remove from Cart
+                    </button>
                 </div>
+                
         </div>
         
     );

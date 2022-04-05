@@ -1,5 +1,6 @@
 const initialState = {
-    cart: []
+    cart: [],
+    // changeqty: false
 }
 
 export const cartreducer = (state = initialState, action) =>{
@@ -45,12 +46,39 @@ export const cartreducer = (state = initialState, action) =>{
             return{
                 cart : newcart
             }
+        case "CHANGE_QUANTITY":
+            console.log("Change Quantity in cartreducer", action.payload.item, action.payload.qty, state.cart)
+            let changeitem = action.payload.item;
+            changeitem.qty = parseInt(action.payload.qty);
+            console.log("Change quantity in cart reducer page is",changeitem);
+            console.log("CART IN REDUCER IS", state.cart)
+            let newoutput = []
+            state.cart.forEach((item) => {
+                console.log("item is", item);
+                if(changeitem !== null && item.id===changeitem.id){
+                    console.log("INSIDE SAME ITEM LOOP", item.qty, changeitem.qty);
+                    newoutput.push(item);
+                    changeitem = null;
+                }
+                else {
+                    newoutput.push(item);
+                }
+                
+        
+            })
+            return{
+                cart: [...newoutput],
+                // changeqty:true
+            }
+
 
         case "CLEAR_CART":
             console.log("inside clear cart")
-            return state;
-        
-        return state;
+            
+            return{
+                cart:[]
+            };
+        // return state;
             
     }
     return state;

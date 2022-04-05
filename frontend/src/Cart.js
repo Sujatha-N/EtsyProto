@@ -26,7 +26,7 @@ function Cart(){
     }
 
     const total = cart.reduce(
-        (previousValue, currentValue) => previousValue + currentValue.price * currentValue.quantity, 0
+        (previousValue, currentValue) => previousValue + currentValue.price * currentValue.qty, 0
     );
 
     const [totalPrice, setTotalPrice] = useState(total);
