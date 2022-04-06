@@ -11,10 +11,11 @@ function CartItem(props){
     const[quantity, setQuantity] = useState(props.item.quantity);
     const cartreducer = useSelector((state)=> state.cartreducer);
     const{cart} = cartreducer;
-    const[qty, setqty] = useState(cart.qty)
+    const[qty, setqty] = useState(props.item.qty)
     const[sendgift, setsendgift] = useState(false);
     const[description, setDescription] = useState(props.item.description);
     const[modal,setModal] = useState(false);
+    const[message, setMessage] = useState(false)
     
 
     // const qty = cart.qty;
@@ -82,9 +83,39 @@ function CartItem(props){
         setModal(false)
 
     }
+    const changeQuantity = async(e)=>{
+        console.log("------------", props.item.quantity, props.item.qty);
+        if(!message){
+            dispatchEvent({type:"CHANGE_QUANTITY", payload:{item:props.item, qty:qty}})
+            await setMessage(false)
+        }
+        else{
+            setMessage(true)
+        }
+    }
+
+    // const changeQuantity = async(e)=>{
+    //     console.log("------------", props.item.quantity, props.item.qty);
+    //     if(props.item.quantity>=qty){
+    //         dispatchEvent({type:"CHANGE_QUANTITY", payload:{item:props.item, qty:qty}})
+    //         await setMessage(false)
+    //     }
+    //     else if(props.item.quantity<qty){
+    //         await setMessage(true)
+    //     }
+    //     else{
+    //         dispatchEvent({type:"CHANGE_QUANTITY", payload:{item:props.item, qty:qty}})
+    //         await setMessage(false)
+    //     }
+    // }
 
     return(
         <div style={{display:"flex"}}>
+                
+                {props.item.quantity>=qty && message == true ? setMessage(false): null}
+                {props.item.quantity<qty && message == false ? setMessage(true): null}
+                {/* {quantity == 0 && outofstock == false ? setoutofstock(true): null}
+                {quantity > 0 && outofstock == true ? setoutofstock(false): null} */}
             
                 <p> <b>Name: </b>{props.item.iname}</p>
 
@@ -93,15 +124,21 @@ function CartItem(props){
                 {/* <div style={{marginLeft:"50px"}}>
                     <label><b>Quantity: {props.item.qty}</b></label>
                 </div> */}
+                {/* {JSON.stringify(props.item.qty)} */}
                 <div>
                     <label><b>Quantity: </b></label>
-                    <input id="quantity" type="number" value={props.item.qty} min="0"
-                    onChange={(e)=>{
-                        setqty(e.target.value);
-                        dispatchEvent({type:"CHANGE_QUANTITY", payload:{item:props.item, qty:qty}})
-                        // checkquantity();
+                    <input id="quantity" type="number" value={props.item.qty} min="1"
+                    onChange={async (e)=>{
+                        await setqty(e.target.value);
+                        changeQuantity();
+                        // {props.item.quantity>=props.item.qty ? dispatchEvent({type:"CHANGE_QUANTITY", payload:{item:props.item, qty:qty}}) : setMessage(true)}
+
                     }}></input>
                 </div>
+                <Col>
+                {/* {JSON.stringify(message)} */}
+                    {message && <div>Only a maximum of {props.item.quantity} is available</div>}
+                </Col>
                 <div>
                         <label for="gift">Send it as a gift</label>
                         <input type="checkbox" id="gift" name="gift" value="gift" checked = {sendgift} onChange={gift} />

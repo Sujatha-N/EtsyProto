@@ -98,7 +98,7 @@ function ItemDescription(props){
 
     const addtocart = (e)=>{
         e.preventDefault();
-        console.log("Item from add to cart function is",item)
+        console.log("Item from add to cart function is",item, qty)
         if(!message){
             dispatchEvent({type:"ADD_TO_CART", payload:[{item:{item}, qty:{qty}}]})
             history.push('/cart');
@@ -140,6 +140,7 @@ function ItemDescription(props){
             </Row>
             <Row>
                 <Col>
+                {/* {JSON.stringify(qty)} */}
                 <label><b>Quantity: </b></label>
                 <input id="quantity" type="number" value={qty} min="0"
                 onChange={(e)=>{

@@ -9,6 +9,7 @@ import url from './config.json';
 function Cart(){
     
     let dispatchEvent = useDispatch();
+
     
 
     const cartreducer = useSelector((state)=> state);
@@ -44,6 +45,7 @@ function Cart(){
         axios.get(url.url+'/editprofile')
             .then((response) =>{
                 console.log("RESPONSE FROM EDIT PROFILE ADDRESS IS -----------------", response.data.address)
+                
                 if(response.data.address){
                     axios.defaults.headers.common["x-auth-token"] = token;
                     axios.post(url.url+'/purchase', {itemstotal:cart.length})

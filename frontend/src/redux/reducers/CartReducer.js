@@ -47,16 +47,16 @@ export const cartreducer = (state = initialState, action) =>{
                 cart : newcart
             }
         case "CHANGE_QUANTITY":
-            console.log("Change Quantity in cartreducer", action.payload.item, action.payload.qty, state.cart)
+            console.log("Change Quantity in cartreducer", action.payload, action.payload.item, action.payload.qty, state.cart)
             let changeitem = action.payload.item;
             changeitem.qty = parseInt(action.payload.qty);
-            console.log("Change quantity in cart reducer page is",changeitem);
+            console.log("Change quantity in cart reducer page is",changeitem, changeitem.qty, action.payload.qty);
             console.log("CART IN REDUCER IS", state.cart)
             let newoutput = []
             state.cart.forEach((item) => {
                 console.log("item is", item);
                 if(changeitem !== null && item.id===changeitem.id){
-                    console.log("INSIDE SAME ITEM LOOP", item.qty, changeitem.qty);
+                    console.log("INSIDE SAME ITEM LOOP",item.qty, item.quantity);
                     newoutput.push(item);
                     changeitem = null;
                 }
