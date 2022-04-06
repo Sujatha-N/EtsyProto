@@ -64,10 +64,37 @@ export const cartreducer = (state = initialState, action) =>{
                     newoutput.push(item);
                 }
                 
-        
             })
             return{
                 cart: [...newoutput],
+                // changeqty:true
+            }
+        case "ADD_DESCRIPTION":
+            console.log("inside add description")
+            let descitem = action.payload.item;
+            descitem.description = action.payload.description
+            descitem.sendgift = 'yes'
+            console.log("Add Description in cart reducer page is",descitem, descitem.description);
+            console.log("CART IN REDUCER IS", state.cart)
+            let descoutput = []
+            state.cart.forEach((item) => {
+                console.log("item is", item);
+                if(descitem !== null && item.id===descitem.id){
+                    console.log("INSIDE SAME ITEM LOOP", item.description, descitem.description);
+                    item.description = descitem.description;
+                    descoutput.push(item);
+                    descitem = null;
+                }
+                else {
+                    descoutput.push(item);
+                    console.log(descoutput)
+                }
+                
+            })
+            console.log(descoutput)
+            return{
+                cart: [...descoutput]
+                
                 // changeqty:true
             }
 

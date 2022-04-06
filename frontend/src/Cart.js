@@ -9,10 +9,15 @@ import url from './config.json';
 function Cart(){
     
     let dispatchEvent = useDispatch();
+    
 
     const cartreducer = useSelector((state)=> state);
     console.log("CHECKING CART REDUCER DATA: ",cartreducer);
     const cart = cartreducer.cartreducer.cart;
+
+    const currencyreducer = useSelector((state)=> state);
+    console.log("CHECKING CURRENCY REDUCER DATA: ",currencyreducer.currencyreducer.currency);
+    const currency = currencyreducer.currencyreducer.currency;
 
     console.log('URL', url)
 
@@ -25,7 +30,7 @@ function Cart(){
         history.push("/login")
     }
 
-    const total = cart.reduce(
+    let total = cart.reduce(
         (previousValue, currentValue) => previousValue + currentValue.price * currentValue.qty, 0
     );
 
@@ -48,9 +53,10 @@ function Cart(){
                                 console.log("Inserted into purchases and moves on to inserting in orders")
                                 {cart.map((item)=>{
                                     console.log("ITEM IN AXIOS LOOP IS", item)
-                                    console.log("QUANTITY SENDING THROUGH CART IS", item.qty)
+                                    console.log("QUANTITY SENDING THROUGH CART IS", item.qty, item.sendgift)
+                                    
                                     return(
-                                        axios.post(url.url+'/orders', {ordername:item.iname, orderquantity: item.qty, orderprice: item.price, orderitemid: item.id, orderimage: item.itemimage})
+                                        axios.post(url.url+'/orders', {ordername:item.iname, orderquantity: item.qty, orderprice: item.price, orderitemid: item.id, orderimage: item.itemimage, description: item.description, sendgift: item.sendgift})
                                         .then((response)=>{
                                             console.log(response);
                                             if(response.status === 200){
@@ -81,12 +87,14 @@ function Cart(){
         
     }
 
-    useEffect((e) => {
+    // useEffect((e) => {
+       
+    //     console.log("Total price is",totalPrice);
 
-        setTotalPrice(total);
-        console.log("Total price is",totalPrice);
+    // }, [sendgift, totalPrice]);
 
-    }, []);
+
+    
 
     return(
         <div>
@@ -99,6 +107,7 @@ function Cart(){
                         <CartItem item = {item} stp = {setTotalPrice}/>
                         );
                     })}
+                    
                     <div>
                         <span>TOTAL: ({cart.length} items)</span>
                         <span>$ {totalPrice}</span>

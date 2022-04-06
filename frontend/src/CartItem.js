@@ -4,6 +4,7 @@ import {useHistory,Link} from 'react-router-dom';
 import {Row, Col, Form, Button} from 'react-bootstrap';
 import {useSelector, useDispatch} from 'react-redux';
 import url from './config.json';
+import Modal from 'react-modal';
 
 function CartItem(props){
 
@@ -11,6 +12,9 @@ function CartItem(props){
     const cartreducer = useSelector((state)=> state.cartreducer);
     const{cart} = cartreducer;
     const[qty, setqty] = useState(cart.qty)
+    const[sendgift, setsendgift] = useState(false);
+    const[description, setDescription] = useState(props.item.description);
+    const[modal,setModal] = useState(false);
     
 
     // const qty = cart.qty;
@@ -33,9 +37,27 @@ function CartItem(props){
         // axios.get('http://localhost:4000/getshopname')
         // .then(async response =>{
         //     console.log("Response from shopname api is",response)
-            
         // })
-    }, []);
+    }, [sendgift]);
+
+    const gift = async (e)=>{
+
+        console.log("INSIDE gift")
+        e.preventDefault();
+        console.log("Before setting",sendgift)
+        if(sendgift === true){
+            await setsendgift(false);
+            await setModal(false)
+        }
+        else{
+            await setsendgift(true);
+            await setModal(true)
+        }
+        
+        console.log("After setting",sendgift)
+    }
+
+
 
 
     const currencyreducer = useSelector((state)=> state);
@@ -52,6 +74,13 @@ function CartItem(props){
     const removefromcart = () =>{
         dispatchEvent({type:"REMOVE_FROM_CART", payload:{item:props.item}}
         )
+    }
+
+    const onsave = (e)=>{
+        e.preventDefault();
+        dispatchEvent({type:"ADD_DESCRIPTION", payload:{item:props.item, description:description}})
+        setModal(false)
+
     }
 
     return(
@@ -73,6 +102,28 @@ function CartItem(props){
                         // checkquantity();
                     }}></input>
                 </div>
+                <div>
+                        <label for="gift">Send it as a gift</label>
+                        <input type="checkbox" id="gift" name="gift" value="gift" checked = {sendgift} onChange={gift} />
+                </div>
+
+                <Modal isOpen={modal} style={{marginLeft:"100px"}}>
+                <div style={{marginLeft:"650px"}}>
+                    
+                    <div>
+                        <label><b>Description: </b></label>
+                        <input id="description" type="text"
+                        onChange={(e)=>{
+                            setDescription(e.target.value);
+                        }}
+                        
+                        />
+                    </div>
+                    <Button className = "w-5 mt-1" type="submit" onClick={onsave}>Save</Button>
+
+                </div>
+                </Modal>
+                
                 <div>
                     <button onClick = {removefromcart} style ={{marginLeft:"10px"}}>
                             Remove from Cart

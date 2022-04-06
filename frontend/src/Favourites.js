@@ -79,21 +79,25 @@ function Favourites(){
             </div>
 
             <div>
-                <Row>
+            {filteredItems.length!==0 ? (
+                    <Row>
 
-                    {filteredItems.map((item)=>{
-                        return (
-                            <Col>
-                                <ItemsCard item= {item}/>
-        
-                            </Col>
-                        );
-                    }
-                    )}
+                        {filteredItems.map((item)=>{
+                            return (
+                                <Col>
+                                    <ItemsCard item= {item}/>
+            
+                                </Col>
+                            );
+                        }
+                        )}
 
-                </Row>
-                
-                
+                    </Row>
+            ) : (
+                <div>
+                    No favourites so far!
+                </div>
+            )}   
                 
             </div>
         </div>

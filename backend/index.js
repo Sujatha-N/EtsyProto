@@ -842,7 +842,14 @@ app.post("/orders",(req,res)=>{
         if(result.length>0){
             orderid = result[0].purchaseid;
             console.log("ID from purchases table is",orderid)
-            connection.query("INSERT INTO orders (orderid,ordername,orderquantity,orderprice,orderitemid, orderimage) VALUES (?,?,?,?,?,?)", [orderid,req.body.ordername, req.body.orderquantity, req.body.orderprice, req.body.orderitemid, req.body.orderimage], (err,result)=>{
+            let sendgift = '';
+            if(req.body.sendgift==='yes'){
+                sendgift='yes'
+            }
+            else{
+                sendgift='no'
+            }
+            connection.query("INSERT INTO orders (orderid,ordername,orderquantity,orderprice,orderitemid, orderimage, sendgift, giftdescription) VALUES (?,?,?,?,?,?,?,?)", [orderid,req.body.ordername, req.body.orderquantity, req.body.orderprice, req.body.orderitemid, req.body.orderimage, sendgift, req.body.description], (err,result)=>{
                 if(err){
                     res.send({err: err});
                     console.log(err)

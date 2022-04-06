@@ -221,14 +221,14 @@ function Dashboard(props){
 
         console.log("INSIDE INSTOCK")
         e.preventDefault();
-        console.log(instockitems)
+        console.log("Before setting", instockitems)
         if(instockitems == true){
             setinStock(false);
         }
         else{
             setinStock(true);
         }
-        console.log(instockitems)
+        console.log("After setting",instockitems)
         
     }
 

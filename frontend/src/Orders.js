@@ -49,6 +49,14 @@ function Orders(props){
                             <Col>
                                 Shop Name: {item.shopname}
                             </Col>
+                            <Col>
+                                Sending as gift: {item.sendgift}
+                            </Col>
+                            {item.sendgift === 'yes' &&
+                            <Col>
+                                {item.giftdescription}
+                            </Col>
+                            }
                         </Row>
                     </React.Fragment>
                     

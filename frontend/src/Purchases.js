@@ -28,23 +28,31 @@ function Purchases(){
 
     return(
         <div>
-            {orders.map((item)=>{
-                return(
-                    <Row>
-                        <Col>
-                            <Link to={`/orders/${item.purchaseid}`}>Order ID: {item.purchaseid}</Link>
-                        </Col>
-                        <Col styles={{width:"200px"}}>
-                            Total items ordered : {item.itemstotal}
-                        </Col>
-                        <Col style={{width:"1000px"}}>
-                            Date Of Purchase : {item.purchasedate}
-                        </Col>
-    
-                    </Row>
-                    );
-                })
-            }
+            {orders.length!==0 ? (
+                <div>
+                    {orders.map((item)=>{
+                        return(
+                            <Row>
+                                <Col>
+                                    <Link to={`/orders/${item.purchaseid}`}>Order ID: {item.purchaseid}</Link>
+                                </Col>
+                                <Col styles={{width:"200px"}}>
+                                    Total items ordered : {item.itemstotal}
+                                </Col>
+                                <Col style={{width:"1000px"}}>
+                                    Date Of Purchase : {item.purchasedate}
+                                </Col>
+            
+                            </Row>
+                            );
+                        }) 
+                    }
+                </div>
+            ) : (
+                <div>
+                    No Purchases done so far!
+                </div>
+            )}
         </div>
     );
 
