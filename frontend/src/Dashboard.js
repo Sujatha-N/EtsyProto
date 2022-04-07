@@ -69,7 +69,7 @@ function Dashboard(props){
 
     let filteredItems = items.filter((item)=>{
             const lowercase = props.filterSearch.toLowerCase();
-            console.log('Return statement in filter', item.iname.toLowerCase().includes(lowercase))
+            console.log('Return statement in filter', item, item.iname.toLowerCase().includes(lowercase))
             if(!instockitems){
                 return (
                     item.iname.toLowerCase().includes(lowercase)

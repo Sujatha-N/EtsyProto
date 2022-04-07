@@ -986,6 +986,48 @@ app.post("/pricerange",(req,res)=>{
     })
 })
 
+app.post("/addcategory",(req,res)=>{
+    console.log(req.body);
+    const token = req.header("x-auth-token");
+    const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
+    console.log("decoded in ADD category API: ", decoded);
+
+    connection.query("INSERT INTO category (description) VALUES (?)", [req.body.description], (err,result)=>{
+        if(err){
+            res.send({err: err});
+            console.log(err)
+        }
+        if(result){
+            console.log(result);
+            res.status(200).send("Inserted Successfully!")
+        }
+    })
+
+})
+
+app.get("/category",(req,res)=>{
+    const token = req.header("x-auth-token");
+    const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
+    console.log("decoded in GET category page API: ", decoded);
+
+    // LEFT JOIN favourites ON items.id = favourites.itemid
+
+    connection.query("SELECT * FROM category",(err,result)=>{
+        if(err){
+            res.send({err: err});
+            console.log(err)
+        }
+        if(result.length>0){
+            console.log("Result from category page API is:", result);
+            res.send(result);
+        }
+    })
+
+})
+
+
+
+
 // app.get('/s3Url', async(req, res) => {
 //     console.log(req.query.imagename)
 //     const url = await generateUploadURL.generateUploadURL(req.query.imagename)

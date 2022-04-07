@@ -17,6 +17,7 @@ function Sell(){
     const [shopName, setShopname] = useState()
     const[message , setMessage] = useState('')
     const[gotoshop, setgotoshop] = useState(false)
+    
 
 
     const checkshopname = (e)=>{

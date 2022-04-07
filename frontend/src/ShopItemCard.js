@@ -68,7 +68,7 @@ function ShopItemCard(props){
                 </Card.Body>
             </Card>
 
-            {showedit && <EditItem showedit = {showedit} itemid = {props.item.id}/>}
+            {showedit && <EditItem showedit = {showedit} itemid = {props.item.id} item={props.item}/>}
 
         </div>
         

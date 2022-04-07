@@ -27,37 +27,66 @@ function EditItem(props){
         history.push("/login")
     }
 
-    const [iname, setIname] = useState('')
-    const [category, setCategory] = useState('')
-    const [description, setDescription] = useState('')
-    const [price, setPrice] = useState()
-    const [quantityAvailable, setQuantityAvailable] = useState()
+    const [iname, setIname] = useState(props.item.iname)
+    const [category, setCategory] = useState(props.item.category)
+    const [description, setDescription] = useState(props.item.description)
+    const [price, setPrice] = useState(props.item.price)
+    const [quantityAvailable, setQuantityAvailable] = useState(props.item.quantity)
     const [priceCurrency, setPriceCurrency] = useState('')
     const[message , setMessage] = useState('')
     const[items,setItems] = useState([]);
     const[image, setImage] = useState('https://upload.wikimedia.org/wikipedia/commons/6/6a/A_blank_flag.png');
+    const[allcategories, setallcategories] = useState([])
+    const[catdesc, setCatDesc] = useState('');
 
     const showedit = props.showedit;
     const itemid = props.itemid;
 
-    useLayoutEffect((e) => {
-        axios.defaults.headers.common["x-auth-token"] = token;
-         axios.post(url.url+'/edititem', {id: props.itemid})
-            .then(async response =>{
-                console.log("Response in items ",response.data)
-                await setItems(response.data)
-                console.log("Items are ",items)
-                setIname(items.iname);
-                setPrice(items.price)
-                setQuantityAvailable(items.quantity);
-                setPriceCurrency(items.price_currency);
-                setImage(items.itemimage);
-                setCategory(items.category);
-                setDescription(items.description);
-            })
-    
-
+    useEffect((e) => {
+        setCategory(props.item.category)
+        axios.get(url.url+'/category')
+            .then(async (response)=>{
+                console.log("RESPONSE FROM CATEGORIES IS", response);
+                if(response){
+                    if(response.status===200){
+                        await setallcategories(response.data);
+                    }
+                    else{
+                        console.log("Some error occurred")
+                    }
+                }
+            });
     }, []);
+
+
+    const addcategory = async (e)=>{
+        e.preventDefault();
+        await setCategory(catdesc)
+        console.log("ADDED CATEGORY", catdesc)
+        axios.defaults.headers.common["x-auth-token"] = token;
+        axios.post(url.url+'/addcategory', {description:catdesc})
+                            .then(async(response)=>{
+                                console.log("RESPONSE LIST FROM CATEGORY ISs ",response.data);
+                                if(response.data){
+                                    console.log("category added")
+                                    axios.get(url.url+'/category')
+                                        .then(async (response)=>{
+                                            console.log("RESPONSE FROM CATEGORIES IS", response);
+                                            if(response){
+                                                if(response.status===200){
+                                                    await setallcategories(response.data);
+                                                }
+                                                else{
+                                                    console.log("Some error occurred")
+                                                }
+                                            }
+                                        });
+                                }else{
+                                    console.log("some error occurred")
+                                }   
+                            });
+
+    }
 
     const imageupload = (e)=>{
         // console.log("Target image upload file is",e.target.files[0])
@@ -74,7 +103,7 @@ function EditItem(props){
     const onsave = (e)=>{
         e.preventDefault();
         axios.defaults.headers.common["x-auth-token"] = token;
-        axios.post(url.url+'/updateedititem', {id: props.itemid, iname: iname, quantity: quantityAvailable, price: price, itemimage: image, category:category, description:description})
+        axios.post(url.url+'/updateedititem', {id: props.itemid, iname: props.item.iname, quantity: quantityAvailable, price: price, itemimage: image, category:category, description:description})
             .then(async response =>{
                 console.log("Response in items ",response.data[0])
                 window.location.reload();
@@ -100,45 +129,48 @@ function EditItem(props){
                     <br/>
                     <div>
                         <label><b>Item Name: </b></label>
-                        <input id="iname" type="text" value = {iname}
+                        <input id="iname" type="text" value = {props.item.iname}
                         onChange={(e)=>{
                             setIname(e.target.value);
                         }}
                     
                         />
                     </div>
-                    
                     <br/>
-
                     <div>
                         <label><b>Description: </b></label>
                         <input id="description" type="text"
                         onChange={(e)=>{
                             setDescription(e.target.value);
                         }}
-                        placeholder = {items.description}
+                        value={props.item.description}
                         />
                     </div>
-
                     <br/>
+                    <div style ={{marginTop: "100px"}}> 
+                        <label><b>Category </b></label>
+                            {/* {JSON.stringify(category)} */}
+                            <select
+                            value={category}
+                            onChange={(e)=>setCatDesc(e.target.value)}
+                            >
+                            {allcategories.map((item)=><option>{item.description}</option>)}
+                            </select>
+                            <label><b>Add new Category </b></label>
+                            <input id="cat" type="text"
+                                onChange={(e)=>{
+                                    setCatDesc(e.target.value);
+                                }}
+                            />
+                            <Button className = "w-5 mt-1" type="submit" onClick={addcategory}>Add Category</Button>
 
-                    <br/>
-
-                    <div>
-                        <label><b>Category: </b></label>
-                        <input id="category" type="text"
-                        onChange={(e)=>{
-                            setCategory(e.target.value);
-                        }}
-                        />
+                            {/* {JSON.stringify(allcategories.map((item)=>item.description))} */}
+                        
                     </div>
-
-
                     <br/>
-
                     <div>
                         <label><b>Price: </b></label>
-                        <input id="price" type="number" value = {price}
+                        <input id="price" type="number" value = {props.item.price}
                         onChange={(e)=>{
                             setPrice(e.target.value);
                         }}
@@ -150,7 +182,7 @@ function EditItem(props){
 
                     <div>
                         <label><b>Quantity Available: </b></label>
-                        <input id="quantityavailable" type="number" value = {quantityAvailable}
+                        <input id="quantityavailable" type="number" value = {props.item.quantity}
                         onChange={(e)=>{
                             setQuantityAvailable(e.target.value);
                         }}
@@ -160,6 +192,8 @@ function EditItem(props){
                     </div>
 
                     <br/>
+
+
 
                     <div>
 

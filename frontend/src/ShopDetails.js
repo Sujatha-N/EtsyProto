@@ -31,7 +31,7 @@ function ShopDetails(props){
 
     console.log("PROPS MATCH ID IS",props.match.params.id)
 
-    const categories = ['Clothing', 'Jewellery', 'Entertainment', 'Home Decor', 'Art'];
+    // const categories = ['Clothing', 'Jewellery', 'Entertainment', 'Home Decor', 'Art'];
 
 
     const[useremail,setUseremail] = useState('')
@@ -51,7 +51,8 @@ function ShopDetails(props){
     const[image, setImage] = useState('https://upload.wikimedia.org/wikipedia/commons/6/6a/A_blank_flag.png');
     const[shopimage, setshopimage] = useState()
     const[shpimg, setshpimg] = useState('')
-    const[allcategories, setallcategories] = useState(categories)
+    const[allcategories, setallcategories] = useState([])
+    const[catdesc, setCatDesc] = useState('');
 
     useEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
@@ -110,6 +111,18 @@ function ShopDetails(props){
                     history.push('/shopdetails/0')
                 }
                 
+            });
+        axios.get(url.url+'/category')
+            .then(async (response)=>{
+                console.log("RESPONSE FROM CATEGORIES IS", response);
+                if(response){
+                    if(response.status===200){
+                        await setallcategories(response.data);
+                    }
+                    else{
+                        console.log("Some error occurred")
+                    }
+                }
             });
 
 
@@ -176,12 +189,33 @@ function ShopDetails(props){
 
     const addcategory = (e)=>{
         e.preventDefault();
-        const newcat = [...allcategories]
-        newcat.push(category);
-        setallcategories(newcat)
+        setCategory(catdesc)
+        axios.defaults.headers.common["x-auth-token"] = token;
+        axios.post(url.url+'/addcategory', {description:catdesc})
+                            .then(async(response)=>{
+                                console.log("RESPONSE LIST FROM CATEGORY IS ",response.data);
+                                if(response.data){
+                                    console.log("category added")
+                                    axios.get(url.url+'/category')
+                                        .then(async (response)=>{
+                                            console.log("RESPONSE FROM CATEGORIES IS", response);
+                                            if(response){
+                                                if(response.status===200){
+                                                    await setallcategories(response.data);
+                                                }
+                                                else{
+                                                    console.log("Some error occurred")
+                                                }
+                                            }
+                                        });
+                                }else{
+                                    console.log("some error occurred")
+                                }   
+                            });
+
     }
 
-
+    
 
     return(
         <div style={{marginTop:"150px"}}>
@@ -252,26 +286,62 @@ function ShopDetails(props){
                     </div>
 
 
-                    <br/>
+                    {/* <br/> */}
 
-                    <div>
+                    {/* <div>
                         <label><b>Category: </b></label>
                         <select
                         onChange={(e)=>{setCategory(e.target.value)}}
                         >
-                        {allcategories.map((index) => <option>{index}</option>)}
-                        </select>
+                        {/* {allcategories.map((index) => <option>{index}</option>)} */}
+                        {/* </select> */}
 
+                        
+
+
+                    {/* </div> */}
+
+                    {/* <div style ={{marginTop: "100px"}}>
+                
+                        <label><b>Category </b></label>
+                        <select
+                        value={category}
+                        onChange={(e)=>setCategory(e.target.value)}
+                        >
+                        {allcategories.map((index) => <option>{index}</option>)}
+
+                        </select>
                         <input id="cat" type="text"
                         onChange={(e)=>{
-                            setCategory(e.target.value);
+                            setCatDesc(e.target.value);
                         }}
                         />
                         
                         <Button className = "w-5 mt-1" type="submit" onClick={addcategory}>Add Category</Button>
+                    </div> */}
 
+                    <div style ={{marginTop: "100px"}}> 
+                        <label><b>Category </b></label>
+                            {/* {JSON.stringify(category)} */}
+                            <select
+                            value={category}
+                            onChange={(e)=>setCategory(e.target.value)}
+                            >
+                            {allcategories.map((item)=><option>{item.description}</option>)}
+                            </select>
+                            <label><b>Add new Category </b></label>
+                            <input id="cat" type="text"
+                                onChange={(e)=>{
+                                    setCatDesc(e.target.value);
+                                }}
+                            />
+                            <Button className = "w-5 mt-1" type="submit" onClick={addcategory}>Add Category</Button>
 
+                            {/* {JSON.stringify(allcategories.map((item)=>item.description))} */}
+                        
                     </div>
+
+
 
                     <br/>
 
