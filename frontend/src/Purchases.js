@@ -114,16 +114,11 @@ function Purchases(){
 
                         <label for="cars">Select a page Size:</label>
 
-                        <select name="pagesize" id="size" onChange={async (e)=>await setPageSize(e.target.value)}>
+                        <select name="pagesize" id="size" value={pageSize} onChange={async (e)=>await setPageSize(e.target.value)}>
                         <option value="2">2</option>
                         <option value="5">5</option>
                         <option value="10">10</option>
-                        
                         </select>
-
-
-
-                    
                 </div>
                 
             ) : (
