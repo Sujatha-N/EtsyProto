@@ -1,0 +1,12 @@
+{
+    "DB":{
+        "host":"etsydatabase.cfrel01uyhoo.us-west-1.rds.amazonaws.com",
+        "username": "admin",
+        "password":"password",
+        "port":"3306",
+        "database":"Etsy"
+    },
+    "ACCESS_TOKEN_SECRET" : "81ae013477494a020044e3a721d501abef001daa0a4f54fa742620eaa4a39ef34f25e2869a85cfe13c80cbceb190e66eae754bc1836f98ba614ca95be6812cac",
+    "REFRESH_TOKEN_SECRET" : "1078544cfa5465bccbffb38c43acc69bd0de75f182a9b196b336489c115fd3f512138deed60bc73a2b0847a00f6a2f584d85eedc5751749a11eaefb967231376"
+
+}

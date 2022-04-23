@@ -20,9 +20,9 @@ function Purchases(){
     const[change, setChange] = useState(false)
     const[pageSize, setPageSize] = useState(5)
     const[pageNumber, setPageNumber] = useState(0);
-    const ordersPerPage = pageSize;
-    const pagesVisited = parseInt(pageNumber) * parseInt(ordersPerPage);
-    const pageCount = Math.ceil(orders.length / ordersPerPage)
+    // const ordersPerPage = pageSize;
+    const pagesVisited = parseInt(pageNumber) * parseInt(pageSize);
+    const pageCount = Math.ceil(orders.length / pageSize)
 
     useEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
@@ -33,13 +33,14 @@ function Purchases(){
             })
     }, [change, pageNumber]);
 
-    const displayOrders = orders.slice(pagesVisited, pagesVisited+ordersPerPage).map((item)=>{
+    const displayOrders = orders.slice(pagesVisited, parseInt(pagesVisited)+parseInt(pageSize)).map((item)=>{
         
         return(
             <Row>
                 {/* {JSON.stringify(orders)}
                 {JSON.stringify(pagesVisited)}
                 {JSON.stringify(pagesVisited+ordersPerPage)} */}
+                {/* {JSON.stringify(parseInt(pagesVisited)+parseInt(pageSize))} */}
                 <Col>
                     <Link to={`/orders/${item.purchaseid}`}>Order ID: {item.purchaseid}</Link>
                 </Col>
@@ -54,7 +55,7 @@ function Purchases(){
     })
 
     const changePage = async (selected) => {
-        console.log("SSSSS", selected.selected, pageNumber, pagesVisited, ordersPerPage)
+        console.log("SSSSS", selected.selected, pageNumber, pagesVisited, pageSize)
         setChange(true)
         await setPageNumber(selected.selected)
         console.log("PAGE NUMBER IS", pageNumber)

@@ -35,7 +35,7 @@ function Navigatorbar(props){
       .catch((err)=>{
         console.log("INSIDE CATCH ");
         // setgotosell(true)
-        history.push('/sell')
+        history.push('/shopdetails/0')
     })
   }
 

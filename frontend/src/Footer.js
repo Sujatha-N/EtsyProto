@@ -16,7 +16,7 @@ function Footer(){
     const[show,setShow] = useState(false);
     const[country,setCountry] = useState('United States');
     const[language, setLanguage] = useState('English');
-    const[currency, setCurrency] = useState('Dollars');
+    const[currency, setCurrency] = useState('$');
 
     const handlecountry = (e) =>{
         e.preventDefault();

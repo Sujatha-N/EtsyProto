@@ -1,5 +1,5 @@
 const initialState = {
-    currency: 'Dollars'
+    currency: '$'
 }
 
 export const currencyreducer = (state = initialState, action) =>{

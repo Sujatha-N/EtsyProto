@@ -13,12 +13,13 @@ import url from './config.json';
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 const config = {
-    bucketName: 'reactetsybucket',
+    bucketName: 'upload-s3-bucket-1',
     // albumName: 'photos',
-    region: 'us-east-2',
-    accessKeyId: 'AKIAXBQK7SIGTUFF2MQ6',
-    secretAccessKey: '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',
-    // s3url: 'https://etsy-ecommerce.s3.us-west-2.amazonaws.com/'
+    region: 'us-west-2',
+    accessKeyId: 'AKIAXBQK7SIGXJ7MIUUH',
+    secretAccessKey: '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',
+    // s3url: 'https://reactetsybucket.s3.us-east-2.amazonaws.com/',
+    
 }
 
 function ShopDetails(props){
@@ -49,8 +50,7 @@ function ShopDetails(props){
     const[message , setMessage] = useState('')
     const[items,setItems] = useState([]);
     const[image, setImage] = useState('https://upload.wikimedia.org/wikipedia/commons/6/6a/A_blank_flag.png');
-    const[shopimage, setshopimage] = useState()
-    const[shpimg, setshpimg] = useState('')
+    const[shpimg, setshpimg] = useState('https://t4america.org/wp-content/uploads/2016/10/Blank-User.jpg')
     const[allcategories, setallcategories] = useState([])
     const[catdesc, setCatDesc] = useState('');
 
@@ -66,6 +66,7 @@ function ShopDetails(props){
                     await setShopOwner(response.data.result[0].owner)
                     await setUseremail(response.data.email)
                     await settotalsalescount(response.data.salescount)
+                    await setshpimg(response.data.shopimage)
                     if(response.data.owneremail == response.data.email){
                         console.log("SETTING IS OWNER TRUe", response.data.result[0].email, response.data.email);
                         setisOwner(true)
@@ -148,25 +149,30 @@ function ShopDetails(props){
     const uploadshopimage = (e)=>{
         console.log("Target image upload file is",e.target.files[0])
         uploadFile(e.target.files[0], config)
-            .then((data)=>{
+            .then(async (data)=>{
                 console.log("Response from react S3 is", data.location);
-                setshopimage(data.location)
-            })
+                axios.defaults.headers.common["x-auth-token"] = token;
+                axios.post(url.url+'/updateshopimage', {shopimage:data.location})
+                    .then(async(response)=>{
+                        console.log("RESPONSE FOR SAVE SHOP IMAGE IS",response);
+                    })
+                await setshpimg(data.location)
             .catch((err)=>{
                 console.log("Error from react S3 is ",err);
             })
-    }
+    })
+}
 
-    const saveimage = (e)=>{
-        e.preventDefault();
-        console.log("INSIDE SAVE IMAGE FOR SHOP IS")
-        axios.defaults.headers.common["x-auth-token"] = token;
-            axios.post(url.url+'/updateshopimage', {shopimage:shopimage})
-            .then(async(response)=>{
-                console.log("RESPONSE FOR SAVE SHOP IMAGE IS",response);
-            history.push("/shopdetails/0")
-        });
-    }
+    // const saveimage = (e)=>{
+    //     e.preventDefault();
+    //     console.log("INSIDE SAVE IMAGE FOR SHOP IS")
+    //     axios.defaults.headers.common["x-auth-token"] = token;
+    //         axios.post(url.url+'/updateshopimage', {shopimage:shopimage})
+    //         .then(async(response)=>{
+    //             console.log("RESPONSE FOR SAVE SHOP IMAGE IS",response);
+    //         history.push("/shopdetails/0")
+    //     });
+    // }
 
     const onsave = (e)=>{
         e.preventDefault();
@@ -249,12 +255,14 @@ function ShopDetails(props){
                 <div style={{display: "flex"}}>
                     <div>
                        
-                        <img style={{width: "200px"}} src={shpimg}/>
-                       
-                    
-                    <input type="file" onChange = {uploadshopimage} required/>
-                    </div>
-                    <Button style={{marginLeft:"-100px"}} className = "w-5 mt-1" type="submit" onClick = {saveimage}>Upload</Button>
+                        {/* <img style={{width: "200px"}} src={shpimg}/> */}
+                        <div style={{width:"180px", height:"180px", marginTop:"-600px", marginLeft:"300px"}}>
+                            <img  src={shpimg} alt="" id="img"/>
+                            <input type="file" onChange = {uploadshopimage} required/>
+                        </div>
+                        
+                        </div>
+                    {/* <Button style={{marginLeft:"-100px"}} className = "w-200 h-50" type="submit" onClick = {saveimage}>Upload</Button> */}
                 </div>
             }
 

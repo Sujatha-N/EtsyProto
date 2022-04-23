@@ -108,7 +108,7 @@ function ItemCard(props){
                         </Link>
                     </Col>
                     <Col>
-                    {JSON.stringify(bgcolor)}
+                    {/* {JSON.stringify(bgcolor)} */}
                         <Button
                             variant="light"
                             className = "fa fa-heart"

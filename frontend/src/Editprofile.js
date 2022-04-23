@@ -19,12 +19,13 @@ function Editprofile(){
     }
 
     const config = {
-        bucketName: 'reactetsybucket',
+        bucketName: 'upload-s3-bucket-1',
         // albumName: 'photos',
-        region: 'us-east-2',
-        accessKeyId: 'AKIAXBQK7SIGTUFF2MQ6',
-        secretAccessKey: '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',
-        // s3url: 'https://etsy-ecommerce.s3.us-west-2.amazonaws.com/'
+        region: 'us-west-2',
+        accessKeyId: 'AKIAXBQK7SIGXJ7MIUUH',
+        secretAccessKey: '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',
+        // s3url: 'https://reactetsybucket.s3.us-east-2.amazonaws.com/',
+        
     }
 
     const imageupload = (e)=>{

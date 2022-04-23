@@ -12,8 +12,8 @@ const config = {
     bucketName: 'upload-s3-bucket-1',
     // albumName: 'photos',
     region: 'us-west-2',
-    accessKeyId: 'AKIAXBQK7SIGUS5YAOP7',
-    secretAccessKey: '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',
+    accessKeyId: 'AKIAXBQK7SIGXJ7MIUUH',
+    secretAccessKey: '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',
     // s3url: 'https://reactetsybucket.s3.us-east-2.amazonaws.com/',
     
 }
@@ -89,7 +89,7 @@ function EditItem(props){
     }
 
     const imageupload = (e)=>{
-        // console.log("Target image upload file is",e.target.files[0])
+        console.log("Target image upload file is",e.target.files[0])
         uploadFile(e.target.files[0], config)
             .then((data)=>{
                 console.log("Response from react S3 is", data.location);

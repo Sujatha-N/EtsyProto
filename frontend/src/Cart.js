@@ -10,8 +10,6 @@ function Cart(){
     
     let dispatchEvent = useDispatch();
 
-    
-
     const cartreducer = useSelector((state)=> state);
     console.log("CHECKING CART REDUCER DATA: ",cartreducer);
     const cart = cartreducer.cartreducer.cart;

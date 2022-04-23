@@ -14,7 +14,7 @@ import url from './config.json';
 
         const register = (e) => {
             e.preventDefault();
-            axios.post(url.url+'/usersignup', {username: userNameReg , email:emailReg, password:passwordReg, image:'https://t4america.org/wp-content/uploads/2016/10/Blank-User.jpg'})
+            axios.post(url.url+'/signup', {username: userNameReg , email:emailReg, password:passwordReg, image:'https://t4america.org/wp-content/uploads/2016/10/Blank-User.jpg'})
                 .then((response)=>{
                     console.log("Response from user table is ",response);
                     if(response.status===200){

@@ -81,12 +81,11 @@ function Favourites(){
             <div>
             {filteredItems.length!==0 ? (
                     <Row>
-
+                        
                         {filteredItems.map((item)=>{
                             return (
                                 <Col>
                                     <ItemsCard item= {item}/>
-            
                                 </Col>
                             );
                         }

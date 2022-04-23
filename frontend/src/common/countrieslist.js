@@ -23,7 +23,7 @@ export const pricecurrency = [
     // {label: "Rupees", value: "Rupees"},
     // {label: "Dollars", value: "Dollars"}
 
-    "Rupees", "Dollars"
+    "₹", "$"
 
 ];
 

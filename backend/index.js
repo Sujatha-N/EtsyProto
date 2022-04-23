@@ -8,6 +8,7 @@ var constants = require("./config.json");
 const jwt = require("jsonwebtoken");
 var aws = require('aws-sdk');
 const generateUploadURL = require('./s3')
+var kafka = require('./kafka/client');
 
 
 
@@ -30,23 +31,47 @@ app.get('/', (req,res) =>{
     res.send("Hello World")
 })
 
-app.post("/usersignup",(req,res) =>{
-    console.log(req.body);
-    const username = req.body.username;
-    const password = req.body.password;
-    const email = req.body.email;
-    const image = req.body.image
+
+app.post("/signup",(req,res)=>{
     
-    connection.query("INSERT INTO user (email,username,password,image) VALUES (?,?,?,?)", [email,username,password,image], (err, result)=>{
-        if(err){
-            console.log(err);
-        }
-        else{
-            console.log("Inserted successfully into the user table: " ,result);
-            res.status(200).send("Inserted successfully into the user table")
+    const msg = {};
+    msg.password = req.body.password;
+    msg.email = req.body.email;
+    msg.username = req.body.username;
+    msg.image = req.body.image;
+    kafka.make_request('signup',msg, function(err,results){
+        console.log('in signup');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+            res.json({
+                status:"error",
+                msg:"System Error, Try Again."
+            })
+        }else{
+            res.status(results.status).send(results);
         }
     })
 })
+
+
+// app.post("/usersignup",(req,res) =>{
+//     console.log(req.body);
+//     const username = req.body.username;
+//     const password = req.body.password;
+//     const email = req.body.email;
+//     const image = req.body.image
+    
+//     connection.query("INSERT INTO user (email,username,password,image) VALUES (?,?,?,?)", [email,username,password,image], (err, result)=>{
+//         if(err){
+//             console.log(err);
+//         }
+//         else{
+//             console.log("Inserted successfully into the user table: " ,result);
+//             res.status(200).send("Inserted successfully into the user table")
+//         }
+//     })
+// })
 
 // app.post("/shopsignup",(req,res) =>{
 //     console.log(req.body);
@@ -66,31 +91,52 @@ app.post("/usersignup",(req,res) =>{
 // })
 
 
+// app.post("/login",(req,res)=>{
+//     console.log(req.body);
+//     const password = req.body.password;
+//     const email = req.body.email;
+//     connection.query("SELECT * FROM user WHERE email = ? AND password = ?", [email, password], 
+//     (err, result) =>{
+//         if(err){
+//             res.send({err: err});
+//             console.log(err)
+//         }
+//         if(result.length>0){
+//             console.log(constants.ACCESS_TOKEN_SECRET)
+//             const accessToken = jwt.sign(email, constants.ACCESS_TOKEN_SECRET)
+//             console.log(accessToken)
+//             res.send({accessToken: accessToken})
+//             // res.send(result);
+//             console.log(result)
+//             console.log("Login successful")
+//         }
+//         else{
+//             res.status(404).send({message: "Invalid credentials"})
+//             console.log("Invalid credentials")
+//         }
+//     })
+// })
+
 app.post("/login",(req,res)=>{
-    console.log(req.body);
-    const password = req.body.password;
-    const email = req.body.email;
-    connection.query("SELECT * FROM user WHERE email = ? AND password = ?", [email, password], 
-    (err, result) =>{
-        if(err){
-            res.send({err: err});
-            console.log(err)
-        }
-        if(result.length>0){
-            console.log(constants.ACCESS_TOKEN_SECRET)
-            const accessToken = jwt.sign(email, constants.ACCESS_TOKEN_SECRET)
-            console.log(accessToken)
-            res.send({accessToken: accessToken})
-            // res.send(result);
-            console.log(result)
-            console.log("Login successful")
-        }
-        else{
-            res.status(404).send({message: "Invalid credentials"})
-            console.log("Invalid credentials")
+    
+    const msg = {};
+    msg.password = req.body.password;
+    msg.email = req.body.email;
+    kafka.make_request('login',msg, function(err,results){
+        console.log('in login');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+            res.json({
+                status:"error",
+                msg:"System Error, Try Again."
+            })
+        }else{
+            res.status(results.status).send(results);
         }
     })
 })
+
 
 // app.post("/profile",(req,res) =>{
 //     console.log(req.body);
@@ -273,6 +319,7 @@ app.post("/updateedititem",(req,res)=>{
     const token = req.header("x-auth-token");
     const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
     console.log("decoded in POST editprofile API : ", decoded);
+    console.log("ITEM IMAGE IS", req.body.itemimage)
 
     connection.query("UPDATE items SET iname = ?, quantity = ?, price = ?, itemimage = ?, category=?, description=? where id = ?", [req.body.iname, req.body.quantity, req.body.price, req.body.itemimage, req.body.category, req.body.description, req.body.id], (err,result)=>{
         if(err){
@@ -672,35 +719,64 @@ app.post("/itemdescription",(req,res)=>{
 
 })
 
-app.post("/addtofavourites",(req,res) =>{
-    console.log(req.body);
-    const token = req.header("x-auth-token");
-    const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
-    console.log("decoded in add to favourites API: ", decoded);
-    const itemname = req.body.itemname
-    const itemprice = req.body.itemprice
-    const itemcurrency = req.body.itemcurrency
-    const itemid = req.body.itemid
-    const liked = req.body.liked
-    const image = req.body.image
+// app.post("/addtofavourites",(req,res) =>{
+//     console.log(req.body);
+//     const token = req.header("x-auth-token");
+//     const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
+//     console.log("decoded in add to favourites API: ", decoded);
+//     const itemname = req.body.itemname
+//     const itemprice = req.body.itemprice
+//     const itemcurrency = req.body.itemcurrency
+//     const itemid = req.body.itemid
+//     const liked = req.body.liked
+//     const image = req.body.image
     
-    connection.query("INSERT INTO favourites (itemname,itemprice,itemcurrency,email, itemid, liked, image) VALUES (?,?,?,?,?,?,?)", [itemname,itemprice,itemcurrency,decoded,itemid,liked,image], (err, result)=>{
-        if(err){
-            console.log(err);
-        }
-        else{
-            console.log("Inserted successfully into the favourites table: " ,result);
-            // connection.query("UPDATE items SET liked = 'yes' where id = ? ",[req.body.itemid], (error, itemsresult)=>{
-            //     if(error){
-            //         console.log(error);
-            //     }
-            //     else{
-            //         console.log("UPDATED successfully into the items table: " ,itemsresult);
+//     connection.query("INSERT INTO favourites (itemname,itemprice,itemcurrency,email, itemid, liked, image) VALUES (?,?,?,?,?,?,?)", [itemname,itemprice,itemcurrency,decoded,itemid,liked,image], (err, result)=>{
+//         if(err){
+//             console.log(err);
+//         }
+//         else{
+//             console.log("Inserted successfully into the favourites table: ",result);
+//             // connection.query("UPDATE items SET liked = 'yes' where id = ? ",[req.body.itemid], (error, itemsresult)=>{
+//             //     if(error){
+//             //         console.log(error);
+//             //     }
+//             //     else{
+//             //         console.log("UPDATED successfully into the items table: " ,itemsresult);
                     
-            //         res.status(200).send("Inserted successfully into the favourites table")
-            //     }
-            // })
-            res.status(200).send("Inserted successfully into the favourites table")
+//             //         res.status(200).send("Inserted successfully into the favourites table")
+//             //     }
+//             // })
+//             res.status(200).send("Inserted successfully into the favourites table")
+//         }
+//     })
+// })
+
+
+app.post("/addtofavourites",(req,res)=>{
+    
+    // console.log("decoded in add to favourites API: ", decoded);
+    const msg = {};
+    msg.token = req.header("x-auth-token");
+    msg.decoded = jwt.verify(msg.token, constants.ACCESS_TOKEN_SECRET);
+    msg.itemname = req.body.itemname
+    msg.itemprice = req.body.itemprice
+    msg.itemcurrency = req.body.itemcurrency
+    msg.itemid = req.body.itemid
+    msg.liked = req.body.liked
+    msg.image = req.body.image
+
+    kafka.make_request('favourites',msg, function(err,results){
+        console.log('in favourites');
+        console.log(results);
+        if (err){
+            console.log("Inside err");
+            res.json({
+                status:"error",
+                msg:"System Error, Try Again."
+            })
+        }else{
+            res.status(results.status).send(results);
         }
     })
 })
@@ -790,23 +866,44 @@ app.post("/profilepic",(req,res)=>{
     })
 })
 
-app.post("/purchase",(req,res)=>{
-    console.log(req.body);
-    const token = req.header("x-auth-token");
-    const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
-    console.log("decoded in POST purchase API: ", decoded);
+// app.post("/purchase",(req,res)=>{
+    // console.log(req.body);
+    // const token = req.header("x-auth-token");
+    // const decoded = jwt.verify(token, constants.ACCESS_TOKEN_SECRET);
+    // console.log("decoded in POST purchase API: ", decoded);
 
-    connection.query("INSERT INTO purchase (itemstotal,useremailid) VALUES (?,?)", [req.body.itemstotal, decoded], (err,result)=>{
-        if(err){
-            res.send({err: err});
-            console.log(err)
-        }
-        if(result){
-            console.log(result);
-            res.status(200).send("Inserted Successfully!")
+    // connection.query("INSERT INTO purchase (itemstotal,useremailid) VALUES (?,?)", [req.body.itemstotal, decoded], (err,result)=>{
+    //     if(err){
+    //         res.send({err: err});
+    //         console.log(err)
+    //     }
+    //     if(result){
+    //         console.log(result);
+    //         res.status(200).send("Inserted Successfully!")
+    //     }
+    // })
+// })
+
+app.post("/purchase",(req,res)=>{
+    
+    const msg = {};
+    msg.token = req.header("x-auth-token");
+    msg.decoded = jwt.verify(msg.token, constants.ACCESS_TOKEN_SECRET);
+    msg.itemstotal = req.body.itemstotal;
+    console.log("decoded", msg.decoded)
+
+    kafka.make_request('purchase',msg, function(err,results){
+        console.log('in purchase');
+        if (err){
+            console.log("Inside err");
+            res.json({
+                status:"error",
+                msg:"System Error, Try Again."
+            })
+        }else{
+            res.status(results.status).send(results);
         }
     })
-
 })
 
 app.get("/purchase",(req,res)=>{

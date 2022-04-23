@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import {useHistory} from 'react-router-dom';
-import {Row, Col} from 'react-bootstrap';
+import {Row, Col, Button} from 'react-bootstrap';
 import Navigatorbar from './Navigatorbar';
 import "./Styles/Styles.css";
 import Favourites from './Favourites';
@@ -12,12 +12,12 @@ window.Buffer = window.Buffer || require("buffer").Buffer;
 
 
 const config = {
-    bucketName: 'reactetsybucket',
+    bucketName: 'upload-s3-bucket-1',
     // albumName: 'photos',
-    region: 'us-east-2',
-    accessKeyId: 'AKIAXBQK7SIGTUFF2MQ6',
-    secretAccessKey: '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',
-    // s3url: 'https://etsy-ecommerce.s3.us-west-2.amazonaws.com/'
+    region: 'us-west-2',
+    accessKeyId: 'AKIAXBQK7SIGXJ7MIUUH',
+    secretAccessKey: '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',
+    // s3url: 'https://reactetsybucket.s3.us-east-2.amazonaws.com/',
 }
 
 function Profile(){
@@ -30,6 +30,7 @@ function Profile(){
 
 
     const [emailPro, setEmailPro] = useState('')
+    const[pro,setpro] = useState(false);
     const [userNamePro, setUserNamePro] = useState('')
     const [genderPro, setGenderPro] = useState('Rather Not Say')
     const [cityPro, setCityPro] = useState('')
@@ -41,29 +42,30 @@ function Profile(){
     useEffect((e) => {
         axios.defaults.headers.common["x-auth-token"] = token;
         axios.get(url.url+'/editprofile')
-            .then((response)=>{
+            .then(async (response)=>{
                 console.log(response.data);
-                setEmailPro(response.data.email)
-                setUserNamePro(response.data.username)
-                setGenderPro(response.data.gender)
-                setCityPro(response.data.city)
-                setAboutPro(response.data.about)
-                setprofileimg(response.data.image)
+                await setEmailPro(response.data.email)
+                await setUserNamePro(response.data.username)
+                await setGenderPro(response.data.gender)
+                await setCityPro(response.data.city)
+                await setAboutPro(response.data.about)
+                await setprofileimg(response.data.image)
                 console.log("FETCH FROM DATABASE IN PROFILE PAGE is ", emailPro,userNamePro,genderPro,cityPro,aboutPro,profileimg)
             })
     });
 
+
     const imageupload = (e)=>{
         // console.log("Target image upload file is",e.target.files[0])
         uploadFile(e.target.files[0], config)
-            .then((data)=>{
+            .then(async (data)=>{
                 console.log("Response from react S3 is", data.location);
                 axios.defaults.headers.common["x-auth-token"] = token;
                 axios.post(url.url+'/profilepic', {image: data.location})
                     .then((response)=>{
                         console.log(response.data);
                     })
-                setprofileimg(data.location)
+                await setprofileimg(data.location)
                 })
                 
             .catch((err)=>{
@@ -71,23 +73,58 @@ function Profile(){
             })
     }
 
-    const propic = (e)=>{
-        e.preventDefault();
-        
+    // const imageupload = (e)=>{
+    //     console.log("Target image upload file is",e.target.files[0])
+    //     uploadFile(e.target.files[0], config)
+    //         .then((data)=>{
+    //             console.log("Response from react S3 is", data.location);
+    //             setprofileimg(data.location)
+    //             propic()
+    //         })
+    //         .catch((err)=>{
+    //             console.log("Error from react S3 is ",err);
+    //         })
+    // }
+    
+
+    // const propic = (e)=>{
+    //     e.preventDefault();
+    //     axios.defaults.headers.common["x-auth-token"] = token;
+    //         axios.post(url.url+'/profilepic', {image: profileimg})
+    //             .then((response)=>{
+    //                 console.log(response.data);
+    //             })
+    // }
+
+    const propic = async(e)=>{
+        if(!setpro){
+            await setpro(true);
+        }
+        else{
+            await setpro(false);
+        }
     }
+    
 
     return (
         <React.Fragment>
             <div style={{display: "flex", marginTop: "100px"}}>
                 {/* <Row>
                     <Col> */}
+                    
                         <div style={{width:"180px", height:"180px"}}>
                             <img src={profileimg} alt="" id="img" className = "profilepic"/>
                         </div>
-                        <div style={{marginTop: "190px", marginLeft: "-7.5%", marginTop:"180px"}}>
+                        {/* <Button style={{width:"200px", height:"50px", marginTop:"190px"}} className = "w-10 mt-1 h-1" type="submit" onClick={propic}>Update Profile Picture</Button> */}
+
+                        {<div style={{marginTop: "190px", marginLeft: "-15.5%", marginTop:"190px"}}>
+                            {/* <label class="fa fa-camera"></label> */}
+                            <input type="file" onChange = {imageupload} required/>
+                        </div>}
+                        {/* <div style={{marginTop: "190px", marginLeft: "-7.5%", marginTop:"180px"}}>
                             <label for="profimg"><i class="fa fa-camera" aria-hidden="true"></i></label>
                             <input id = "profimg"type = "file" style={{display:"none", visibility:"none"}} onClick = {imageupload}></input>
-                        </div>
+                        </div> */}
                     {/* </Col> */}
                     {/* <Col style={{marginLeft: "100px"}}> */}
                     <div style = {{marginTop:"100p", marginLeft: "50px"}}>
